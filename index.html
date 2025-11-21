@@ -624,6 +624,43 @@
             }
         }
     </script>
-    <script src="js/loadComponents.js"></script>
+    <script>
+    // 載入 Header
+    fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header-container').innerHTML = data;
+            
+            // 因為是動態載入，script 標籤裡的程式碼不會自動執行
+            // 我們需要手動重新執行 header 裡面的 JS 邏輯 (漢堡選單功能)
+            // 這邊把 header.html 裡的 function 重新宣告到 global scope
+            
+            // 1. 綁定 toggleMobileMenu 到 window
+            window.toggleMobileMenu = function() {
+                const menu = document.getElementById('mobileNav');
+                const btnIcon = document.querySelector('.mobile-menu-btn .material-icons');
+                if (menu.classList.contains('open')) {
+                    menu.classList.remove('open');
+                    btnIcon.innerText = 'menu';
+                } else {
+                    menu.classList.add('open');
+                    btnIcon.innerText = 'close';
+                }
+            };
+
+            // 2. 重新綁定點擊外部關閉事件
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('mobileNav');
+                const btn = document.querySelector('.mobile-menu-btn');
+                if(!menu || !btn) return; // 防止元素還沒載入報錯
+                
+                const isClickInside = menu.contains(event.target) || btn.contains(event.target);
+                if (!isClickInside && menu.classList.contains('open')) {
+                    menu.classList.remove('open');
+                    document.querySelector('.mobile-menu-btn .material-icons').innerText = 'menu';
+                }
+            });
+        });
+</script>
 </body>
 </html>
