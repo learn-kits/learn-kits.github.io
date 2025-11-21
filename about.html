@@ -7,386 +7,329 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
-        /* --- 全局設定 --- */
+        /* --- 基礎設定 --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #F9F7F2; /* 文青米白底色 */
+            background-color: #F9F7F2; /* 米白底色 */
             margin: 0; padding: 0;
-            color: #555;
+            color: #333;
             display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        /* --- 這裡整合了之前的 Header CSS --- */
-        .site-header {
-            width: 100%; height: 60px; background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; box-sizing: border-box;
-            position: sticky; top: 0; z-index: 1000; flex-shrink: 0;
-        }
-        .header-logo { font-size: 1.4em; font-weight: bold; color: #333; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .header-logo span { color: #7FA99B; } /* 改為文青綠 */
-        .desktop-nav { display: flex; align-items: center; gap: 25px; }
-        .nav-item { text-decoration: none; color: #666; font-weight: 500; font-size: 16px; cursor: pointer; transition: color 0.2s; }
-        .nav-item:hover { color: #7FA99B; }
-        .dropdown { position: relative; display: flex; align-items: center; height: 60px; }
-        .dropdown-content { display: none; position: absolute; top: 60px; right: 0; background-color: #fff; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 0 0 8px 8px; overflow: hidden; }
-        .dropdown:hover .dropdown-content { display: block; animation: fadeIn 0.2s; }
-        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; transition: background 0.1s; }
-        .dropdown-content a:hover { background-color: #f5f5f5; color: #7FA99B; }
-        .mobile-menu-btn { display: none; background: none; border: none; font-size: 28px; color: #333; cursor: pointer; }
-        .mobile-nav-overlay { display: none; position: absolute; top: 60px; left: 0; width: 100%; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); flex-direction: column; border-top: 1px solid #eee; }
-        .mobile-nav-overlay a { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; display: block; }
-        .mobile-sub-item { background-color: #fafafa; padding-left: 40px !important; color: #666 !important; }
-        
-        @media (max-width: 768px) {
-            .desktop-nav { display: none; }
-            .mobile-menu-btn { display: block; }
-            .mobile-nav-overlay.open { display: flex; }
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        /* 這裡放 Header 佔位符的樣式 (避免載入前畫面跳動) */
+        #header-container { min-height: 60px; }
 
-        /* --- 作者頁主要內容 --- */
+        /* --- 關於作者主要區塊 --- */
         .container {
-            max-width: 900px;
+            max-width: 960px;
             width: 100%;
-            margin: 0 auto;
-            padding: 40px 20px;
+            margin: 60px auto; /* 上下留白 */
+            padding: 0 20px;
             box-sizing: border-box;
             flex: 1;
         }
 
-        .intro-section {
-            text-align: center;
-            margin-bottom: 50px;
+        /* 
+         * 核心佈局：Profile Card 
+         * 電腦版：左圖右文
+         * 手機版：上圖下文
+         */
+        .profile-card {
+            display: flex;
+            flex-direction: row; /* 預設橫向排列 */
+            align-items: flex-start; /* 頂部對齊 */
+            justify-content: center;
+            gap: 60px; /* 左右間距 */
+            background: #fff;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        }
+
+        /* --- 左側：像素人物區 --- */
+        .avatar-section {
+            flex: 0 0 240px; /* 固定寬度，不讓它亂縮放 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 像素畫布容器 */
+        .pixel-canvas {
+            width: 200px;
+            height: 200px;
+            background-color: #f0f0f0; /* 淡淡的灰色背景，像小恐龍遊戲的沙漠 */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #333; /* 復古黑框 */
+            position: relative;
+        }
+
+        /* SVG 設定：關鍵是 image-rendering: pixelated */
+        .pixel-svg {
+            width: 128px; /* 顯示大小 */
+            height: 128px;
+            image-rendering: pixelated; /* 讓像素放大後保持銳利鋸齒狀，不要模糊 */
+        }
+
+        /* 裝備層動畫 */
+        .equip-layer {
+            display: none; /* 預設隱藏 */
+        }
+        .equip-layer.visible {
+            display: block; /* 顯示 */
+        }
+        
+        /* 裝飾文字 */
+        .avatar-caption {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #888;
+            font-family: 'Courier New', Courier, monospace; /* 打字機字體 */
+        }
+
+        /* --- 右側：文字與技能區 --- */
+        .content-section {
+            flex: 1; /* 佔滿剩餘空間 */
         }
 
         h1 {
-            font-size: 2.2em;
-            color: #4A4A4A;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+            font-size: 2.4em;
+            color: #333;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .bio-text {
             font-size: 1.1em;
-            line-height: 1.8;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto 20px auto;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 30px;
         }
 
         .contact-info {
-            background: #fff;
             display: inline-block;
-            padding: 10px 25px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            color: #7FA99B;
-            font-weight: bold;
+            margin-bottom: 30px;
+            padding: 8px 16px;
+            background: #f4f4f4;
+            color: #333;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-family: monospace;
         }
 
-        /* --- 互動遊戲區塊 --- */
-        .interactive-area {
+        /* 技能開關按鈕區 */
+        .skills-grid {
             display: flex;
-            justify-content: center;
-            gap: 60px;
-            align-items: center;
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            border: 1px solid #f0f0f0;
-        }
-
-        /* 左側：試衣間 (SVG 容器) */
-        .pixel-avatar-container {
-            width: 280px;
-            height: 340px;
-            background-color: #F2F0EB; /* 試衣間背景 */
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-            border: 4px solid #E5E0D8;
-        }
-
-        /* 像素 SVG */
-        .pixel-svg {
-            width: 100%;
-            height: 100%;
-            /* 讓 SVG 呈現像素風格的關鍵：關閉反鋸齒 */
-            image-rendering: pixelated; 
-            shape-rendering: crispEdges;
-        }
-
-        /* 裝備顯示動畫 */
-        .equipment-layer {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .equipment-layer.visible {
-            opacity: 1;
-        }
-
-        /* 右側：控制面板 */
-        .controls-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            max-width: 400px;
+            flex-wrap: wrap; /* 超出換行 */
+            gap: 12px;
         }
 
         .skill-btn {
-            background: white;
-            border: 2px solid #EAE6DF;
-            padding: 15px 10px;
-            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 50px; /* 膠囊狀 */
             cursor: pointer;
-            font-size: 1rem;
-            color: #888;
+            font-size: 0.95em;
+            color: #666;
             transition: all 0.2s;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            min-width: 140px;
+            gap: 6px;
         }
 
         .skill-btn:hover {
-            border-color: #CFCBC4;
-            background: #FAFAFA;
-            transform: translateY(-2px);
+            border-color: #333;
+            color: #000;
         }
 
+        /* 按鈕啟動狀態 (黑底白字) */
         .skill-btn.active {
-            background: #fff;
-            color: #555;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: transparent;
+            background: #333;
+            color: #fff;
+            border-color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* 各個按鈕的激活顏色 (文青色系) */
-        .skill-btn[data-target="glasses"].active { border-left: 5px solid #607D8B; } /* 藍灰 */
-        .skill-btn[data-target="hat"].active { border-left: 5px solid #3E4A61; } /* 深藍 */
-        .skill-btn[data-target="robe"].active { border-left: 5px solid #8DA399; } /* 鼠尾草綠 */
-        .skill-btn[data-target="necklace"].active { border-left: 5px solid #D4A5A5; } /* 乾燥玫瑰 */
-        .skill-btn[data-target="shoes"].active { border-left: 5px solid #D9C589; } /* 芥末黃 */
-        .skill-btn[data-target="wand"].active { border-left: 5px solid #BCAAA4; } /* 奶茶色 */
+        .btn-icon { font-size: 18px; }
 
-        .btn-icon {
-            font-size: 24px;
-            opacity: 0.5;
-        }
-        .skill-btn.active .btn-icon {
-            opacity: 1;
-            color: #333;
-        }
-
-        /* RWD 手機版 */
+        /* --- RWD 手機版 --- */
         @media (max-width: 768px) {
-            .interactive-area {
-                flex-direction: column;
-                padding: 20px;
+            .container { margin: 30px auto; }
+            
+            .profile-card {
+                flex-direction: column; /* 改為垂直排列 */
+                align-items: center; /* 置中 */
+                padding: 30px 20px;
                 gap: 30px;
+                text-align: center; /* 文字置中 */
             }
-            .controls-container {
-                grid-template-columns: repeat(2, 1fr);
-                width: 100%;
+
+            .avatar-section { flex: auto; width: 100%; }
+            
+            .content-section { width: 100%; }
+
+            .skills-grid {
+                justify-content: center; /* 按鈕置中 */
             }
-            .skill-btn {
-                min-width: auto;
-            }
+            
             h1 { font-size: 1.8em; }
+            .bio-text { text-align: left; } /* 內文還是靠左比較好讀 */
         }
     </style>
 </head>
 <body>
 
-<div id="header-container" style="width: 100%;"></div>
+    <!-- 載入 Header -->
+    <div id="header-container" style="width: 100%;"></div>
 
-    <!-- ================= 內容區 ================= -->
+    <!-- 主要內容區 -->
     <div class="container">
-        
-        <section class="intro-section">
-            <h1>關於作者</h1>
-            <div class="bio-text">
-                Hi, 我是 Betty C.<br>
-                現任職於新創公司的 UI/UX 設計師，熱衷於學習新事物。<br>
-                喜歡透過設計解決真實問題，讓產品不只好看，更要好用。
-            </div>
-            <div class="contact-info">
-                📧 歡迎合作：bochen722@gmail.com
-            </div>
-        </section>
-
-        <!-- 互動區 -->
-        <div class="interactive-area">
+        <div class="profile-card">
             
-            <!-- 左邊：像素小女孩 (使用 SVG 繪製) -->
-            <div class="pixel-avatar-container">
-                <svg class="pixel-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                    <!-- 定義顏色 -->
-                    <defs>
-                        <style>
-                            .skin { fill: #FFDAB9; } /* 皮膚色 */
-                            .hair { fill: #6D4C41; } /* 髮色 */
-                            .undies { fill: #FFF; opacity: 0.8; } /* 內襯 */
-                            .glasses-col { fill: #333; }
-                            .hat-col { fill: #3E4A61; }
-                            .robe-col { fill: #8DA399; }
-                            .heart-col { fill: #D4A5A5; }
-                            .shoes-col { fill: #D9C589; }
-                            .wand-stick { fill: #8D6E63; }
-                            .wand-star { fill: #FFD700; }
-                        </style>
-                    </defs>
+            <!-- 左側：像素人物 (Chrome Dino 風格) -->
+            <div class="avatar-section">
+                <div class="pixel-canvas">
+                    <!-- 
+                        32x32 的像素網格 
+                        fill="#333" 代表全黑色塊
+                    -->
+                    <svg class="pixel-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+                        
+                        <!-- 基礎人物：Betty (黑白像素風) -->
+                        <g id="base-character" fill="#333">
+                            <!-- 身體 -->
+                            <rect x="12" y="16" width="8" height="10" />
+                            <!-- 腳 -->
+                            <rect x="13" y="26" width="2" height="4" />
+                            <rect x="17" y="26" width="2" height="4" />
+                            <!-- 手 (自然垂下) -->
+                            <rect x="10" y="17" width="2" height="6" />
+                            <rect x="20" y="17" width="2" height="6" />
+                            
+                            <!-- 頭部 -->
+                            <rect x="10" y="6" width="12" height="10" />
+                            
+                            <!-- 臉部鏤空 (利用白色遮罩做眼睛) -->
+                            <rect x="12" y="10" width="2" height="2" fill="#f0f0f0" /> <!-- 左眼 -->
+                            <rect x="18" y="10" width="2" height="2" fill="#f0f0f0" /> <!-- 右眼 -->
 
-                    <!-- 1. 基礎身體 (Base) -->
-                    <g id="girl-base">
-                        <!-- 腿 -->
-                        <rect x="11" y="22" width="3" height="10" class="skin" />
-                        <rect x="18" y="22" width="3" height="10" class="skin" />
-                        <!-- 身體 -->
-                        <rect x="10" y="12" width="12" height="11" class="skin" />
-                        <!-- 手臂 -->
-                        <rect x="7" y="13" width="3" height="9" class="skin" /> <!-- 左手 -->
-                        <rect x="22" y="13" width="3" height="9" class="skin" /> <!-- 右手 -->
-                        <!-- 內襯裙 -->
-                        <rect x="11" y="13" width="10" height="9" class="undies" />
-                        <!-- 頭 -->
-                        <rect x="10" y="4" width="12" height="10" class="skin" />
-                        <!-- 頭髮 (瀏海與兩側) -->
-                        <rect x="9" y="3" width="14" height="4" class="hair" />
-                        <rect x="9" y="3" width="2" height="10" class="hair" />
-                        <rect x="21" y="3" width="2" height="10" class="hair" />
-                        <!-- 眼睛 -->
-                        <rect x="12" y="8" width="2" height="2" fill="#555" />
-                        <rect x="18" y="8" width="2" height="2" fill="#555" />
-                        <!-- 嘴巴 -->
-                        <rect x="14" y="12" width="4" height="1" fill="#D4A5A5" />
-                    </g>
+                            <!-- 髮型：中分瀏海 -->
+                            <!-- 左邊瀏海 -->
+                            <rect x="10" y="6" width="5" height="3" />
+                            <rect x="10" y="9" width="2" height="3" /> 
+                            <!-- 右邊瀏海 -->
+                            <rect x="17" y="6" width="5" height="3" />
+                            <rect x="20" y="9" width="2" height="3" />
+                            
+                            <!-- 髮型：馬尾 (在頭的左側或右側突出一塊像素) -->
+                            <rect x="22" y="7" width="3" height="4" /> <!-- 馬尾本體 -->
+                            <rect x="23" y="11" width="2" height="2" /> <!-- 馬尾尾端 -->
+                        </g>
 
-                    <!-- 2. 裝備層 (預設隱藏) -->
-                    
-                    <!-- 終身學習：法袍 (覆蓋身體) -->
-                    <g id="layer-robe" class="equipment-layer">
-                        <rect x="10" y="13" width="12" height="14" class="robe-col" />
-                        <rect x="6" y="13" width="4" height="8" class="robe-col" /> <!-- 袖子 -->
-                        <rect x="22" y="13" width="4" height="8" class="robe-col" /> <!-- 袖子 -->
-                        <rect x="13" y="13" width="6" height="14" fill="#A6B9B0" /> <!-- 袍子中間淺色 -->
-                    </g>
+                        <!-- 裝備：眼鏡 (UI設計) -->
+                        <g id="prop-glasses" class="equip-layer">
+                            <rect x="11" y="10" width="4" height="2" fill="#333" />
+                            <rect x="17" y="10" width="4" height="2" fill="#333" />
+                            <rect x="15" y="11" width="2" height="1" fill="#333" /> <!-- 鼻樑架 -->
+                        </g>
 
-                    <!-- 溝通力：漂亮鞋子 -->
-                    <g id="layer-shoes" class="equipment-layer">
-                        <rect x="11" y="29" width="3" height="3" class="shoes-col" />
-                        <rect x="18" y="29" width="3" height="3" class="shoes-col" />
-                        <rect x="11" y="28" width="1" height="1" class="shoes-col" />
-                        <rect x="20" y="28" width="1" height="1" class="shoes-col" />
-                    </g>
+                        <!-- 裝備：學士帽 (UX方法論) -->
+                        <g id="prop-hat" class="equip-layer">
+                            <rect x="8" y="4" width="16" height="2" fill="#333" /> <!-- 帽簷 -->
+                            <rect x="12" y="2" width="8" height="2" fill="#333" /> <!-- 帽頂 -->
+                            <rect x="23" y="4" width="1" height="4" fill="#333" /> <!-- 流蘇 -->
+                        </g>
 
-                    <!-- UI設計：眼鏡 -->
-                    <g id="layer-glasses" class="equipment-layer">
-                        <rect x="11" y="8" width="4" height="2" class="glasses-col" opacity="0.7" />
-                        <rect x="17" y="8" width="4" height="2" class="glasses-col" opacity="0.7" />
-                        <rect x="15" y="9" width="2" height="1" class="glasses-col" />
-                    </g>
+                        <!-- 裝備：書本 (終身學習) -->
+                        <g id="prop-book" class="equip-layer">
+                            <rect x="21" y="20" width="6" height="5" fill="#333" />
+                            <rect x="22" y="21" width="4" height="3" fill="#fff" /> <!-- 書頁 -->
+                        </g>
 
-                    <!-- 心理學：愛心項鍊 -->
-                    <g id="layer-necklace" class="equipment-layer">
-                        <rect x="15" y="15" width="2" height="2" class="heart-col" />
-                        <rect x="14" y="14" width="1" height="1" class="heart-col" />
-                        <rect x="17" y="14" width="1" height="1" class="heart-col" />
-                    </g>
+                        <!-- 裝備：愛心 (心理學) -->
+                        <g id="prop-heart" class="equip-layer">
+                            <!-- 飄在頭上的愛心 -->
+                            <path d="M25 5 h2 v-2 h2 v2 h2 v2 h-2 v2 h-2 v-2 h-2 z" fill="#333"/>
+                        </g>
 
-                    <!-- UX方法論：學者帽 -->
-                    <g id="layer-hat" class="equipment-layer">
-                        <rect x="8" y="2" width="16" height="2" class="hat-col" />
-                        <rect x="11" y="0" width="10" height="2" class="hat-col" />
-                        <rect x="23" y="2" width="1" height="6" fill="#FDD835" /> <!-- 流蘇 -->
-                    </g>
+                        <!-- 裝備：對話框 (溝通力) -->
+                        <g id="prop-chat" class="equip-layer">
+                            <!-- 飄在左邊的 ... -->
+                            <rect x="3" y="4" width="6" height="5" fill="#333" />
+                            <rect x="4" y="5" width="4" height="3" fill="#fff" /> <!-- 氣泡內白 -->
+                            <rect x="5" y="6" width="1" height="1" fill="#333" />
+                            <rect x="7" y="6" width="1" height="1" fill="#333" />
+                        </g>
 
-                    <!-- 跨界整合：魔法棒 -->
-                    <g id="layer-wand" class="equipment-layer">
-                        <rect x="24" y="8" width="2" height="10" class="wand-stick" transform="rotate(15 25 13)" />
-                        <rect x="23" y="6" width="4" height="4" class="wand-star" transform="rotate(15 25 13)" />
-                    </g>
+                        <!-- 裝備：魔法棒 (跨界整合) -->
+                        <g id="prop-wand" class="equip-layer">
+                             <rect x="8" y="14" width="2" height="8" fill="#333" transform="rotate(-15 9 18)"/>
+                             <rect x="7" y="12" width="2" height="2" fill="#333" /> <!-- 星星頭 -->
+                        </g>
 
-                </svg>
+                    </svg>
+                </div>
+                <div class="avatar-caption">LEVEL 1 DESIGNER</div>
             </div>
 
-            <!-- 右邊：技能開關 -->
-            <div class="controls-container">
-                <button class="skill-btn" onclick="toggleEquip('glasses', this)" data-target="glasses">
-                    <span class="material-icons btn-icon">visibility</span>
-                    UI 設計
-                </button>
-                <button class="skill-btn" onclick="toggleEquip('hat', this)" data-target="hat">
-                    <span class="material-icons btn-icon">psychology</span>
-                    UX 方法論
-                </button>
-                <button class="skill-btn" onclick="toggleEquip('robe', this)" data-target="robe">
-                    <span class="material-icons btn-icon">auto_stories</span>
-                    終身學習
-                </button>
-                <button class="skill-btn" onclick="toggleEquip('necklace', this)" data-target="necklace">
-                    <span class="material-icons btn-icon">favorite</span>
-                    心理學
-                </button>
-                <button class="skill-btn" onclick="toggleEquip('shoes', this)" data-target="shoes">
-                    <span class="material-icons btn-icon">record_voice_over</span>
-                    溝通力
-                </button>
-                <button class="skill-btn" onclick="toggleEquip('wand', this)" data-target="wand">
-                    <span class="material-icons btn-icon">auto_fix_high</span>
-                    跨界整合
-                </button>
+            <!-- 右側：文字內容 -->
+            <div class="content-section">
+                <h1>Hi, 我是 Betty C.</h1>
+                
+                <div class="contact-info">
+                    bochen722@gmail.com
+                </div>
+
+                <div class="bio-text">
+                    現任職於新創公司的 UI/UX 設計師，熱衷於學習新事物。<br>
+                    我相信好的設計不只是視覺上的美觀，更是邏輯與同理心的結合。<br><br>
+                    喜歡透過設計解決真實問題，讓產品不只好看，更要好用。<br>
+                    下方是我的技能樹，點擊按鈕看看我裝備了什麼：
+                </div>
+
+                <!-- 技能按鈕 -->
+                <div class="skills-grid">
+                    <button class="skill-btn" onclick="toggleProp('glasses', this)">
+                        <span class="material-icons btn-icon">visibility</span> UI 設計
+                    </button>
+                    <button class="skill-btn" onclick="toggleProp('hat', this)">
+                        <span class="material-icons btn-icon">school</span> UX 方法論
+                    </button>
+                    <button class="skill-btn" onclick="toggleProp('book', this)">
+                        <span class="material-icons btn-icon">auto_stories</span> 終身學習
+                    </button>
+                    <button class="skill-btn" onclick="toggleProp('heart', this)">
+                        <span class="material-icons btn-icon">favorite</span> 心理學
+                    </button>
+                    <button class="skill-btn" onclick="toggleProp('chat', this)">
+                        <span class="material-icons btn-icon">forum</span> 溝通力
+                    </button>
+                    <button class="skill-btn" onclick="toggleProp('wand', this)">
+                        <span class="material-icons btn-icon">auto_fix_high</span> 跨界整合
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
 
     <script>
-        // Header 手機版 Menu 邏輯
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileNav');
-            const btnIcon = document.querySelector('.mobile-menu-btn .material-icons');
-            
-            if (menu.classList.contains('open')) {
-                menu.classList.remove('open');
-                btnIcon.innerText = 'menu';
-            } else {
-                menu.classList.add('open');
-                btnIcon.innerText = 'close';
-            }
-        }
-
-        // 點擊外部關閉 Menu
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('mobileNav');
-            const btn = document.querySelector('.mobile-menu-btn');
-            const isClickInside = menu.contains(event.target) || btn.contains(event.target);
-            
-            if (!isClickInside && menu.classList.contains('open')) {
-                menu.classList.remove('open');
-                document.querySelector('.mobile-menu-btn .material-icons').innerText = 'menu';
-            }
-        });
-
-        // --- 換裝遊戲邏輯 ---
-        function toggleEquip(item, btnElement) {
+        // --- 技能互動邏輯 ---
+        function toggleProp(propName, btn) {
             // 1. 切換按鈕樣式
-            btnElement.classList.toggle('active');
+            btn.classList.toggle('active');
 
-            // 2. 顯示/隱藏對應的 SVG Layer
-            const layerId = 'layer-' + item;
-            const layer = document.getElementById(layerId);
-            
+            // 2. 切換 SVG 裡面的裝備顯示
+            const layer = document.getElementById('prop-' + propName);
             if (layer) {
-                if (btnElement.classList.contains('active')) {
+                if (btn.classList.contains('active')) {
                     layer.classList.add('visible');
                 } else {
                     layer.classList.remove('visible');
@@ -394,44 +337,39 @@
             }
         }
     </script>
-<script>
-    // 載入 Header
-    fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-container').innerHTML = data;
-            
-            // 因為是動態載入，script 標籤裡的程式碼不會自動執行
-            // 我們需要手動重新執行 header 裡面的 JS 邏輯 (漢堡選單功能)
-            // 這邊把 header.html 裡的 function 重新宣告到 global scope
-            
-            // 1. 綁定 toggleMobileMenu 到 window
-            window.toggleMobileMenu = function() {
-                const menu = document.getElementById('mobileNav');
-                const btnIcon = document.querySelector('.mobile-menu-btn .material-icons');
-                if (menu.classList.contains('open')) {
-                    menu.classList.remove('open');
-                    btnIcon.innerText = 'menu';
-                } else {
-                    menu.classList.add('open');
-                    btnIcon.innerText = 'close';
-                }
-            };
 
-            // 2. 重新綁定點擊外部關閉事件
-            document.addEventListener('click', function(event) {
-                const menu = document.getElementById('mobileNav');
-                const btn = document.querySelector('.mobile-menu-btn');
-                if(!menu || !btn) return; // 防止元素還沒載入報錯
+    <script>
+        // 載入 Header (複製自之前的代碼)
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-container').innerHTML = data;
                 
-                const isClickInside = menu.contains(event.target) || btn.contains(event.target);
-                if (!isClickInside && menu.classList.contains('open')) {
-                    menu.classList.remove('open');
-                    document.querySelector('.mobile-menu-btn .material-icons').innerText = 'menu';
-                }
+                // 重新綁定 header 的 JS
+                window.toggleMobileMenu = function() {
+                    const menu = document.getElementById('mobileNav');
+                    const btnIcon = document.querySelector('.mobile-menu-btn .material-icons');
+                    if (menu.classList.contains('open')) {
+                        menu.classList.remove('open');
+                        btnIcon.innerText = 'menu';
+                    } else {
+                        menu.classList.add('open');
+                        btnIcon.innerText = 'close';
+                    }
+                };
+
+                document.addEventListener('click', function(event) {
+                    const menu = document.getElementById('mobileNav');
+                    const btn = document.querySelector('.mobile-menu-btn');
+                    if(!menu || !btn) return;
+                    
+                    const isClickInside = menu.contains(event.target) || btn.contains(event.target);
+                    if (!isClickInside && menu.classList.contains('open')) {
+                        menu.classList.remove('open');
+                        document.querySelector('.mobile-menu-btn .material-icons').innerText = 'menu';
+                    }
+                });
             });
-        });
-</script>
-    
+    </script>
 </body>
 </html>
