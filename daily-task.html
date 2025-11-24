@@ -338,12 +338,28 @@ function init() {
             if (mandala.lastLoginDate !== today) { mandala.dailyQuests = []; mandala.lastLoginDate = today; saveData(); }
         }
         function calculateXP() {
-            let totalDone = 0; mandala.sectors.forEach(s => totalDone += s.done.filter(Boolean).length);
-            const xp = totalDone * 10; const level = Math.floor(xp / 100) + 1; const xpInLevel = xp % 100;
-            document.getElementById('lvlVal').innerText = level;
-            document.getElementById('xpVal').innerText = `${xpInLevel}/100`;
-            document.getElementById('xpFill').style.width = `${xpInLevel}%`;
-        }
+    // 1. 計算總累積次數 (讀取 score 而不是 done)
+    let totalScore = 0;
+    mandala.sectors.forEach(s => {
+        totalScore += (s.score || 0); // 防止舊資料沒有 score 報錯
+    });
+
+    // 2. 設定經驗值公式
+    // 這裡設定：完成 1 次任務 = 10 XP
+    const currentXP = totalScore * 10;
+
+    // 3. 設定等級公式 (線性：每 100 XP 升一級)
+    // 如果你想要變難 (RPG 模式)，可以改這一行
+    const level = Math.floor(currentXP / 100) + 1;
+    
+    // 4. 計算當前等級的進度條 (0~100%)
+    const xpInLevel = currentXP % 100;
+
+    // 更新畫面
+    document.getElementById('lvlVal').innerText = level;
+    document.getElementById('xpVal').innerText = `${xpInLevel}/100`;
+    document.getElementById('xpFill').style.width = `${xpInLevel}%`;
+}
 
         function toggleEditMode() {
             isEditing = !isEditing;
