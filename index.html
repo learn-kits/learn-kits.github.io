@@ -138,6 +138,7 @@
             cursor: pointer; 
             width: 100%;
             max-width: 340px; 
+            /* 預設允許長大 */
             flex: 1 1 auto;   
         }
         
@@ -235,18 +236,23 @@
         }
         .error-msg { color: #EF4444; font-size: 0.9em; margin-top: 10px; text-align: center; }
 
-        /* ★★★ 手機版優化 (修改處) ★★★ */
+        /* ★★★ 手機版優化 (重要修改) ★★★ */
         @media (max-width: 600px) {
             .pagination { bottom: 20px; width: 85%; }
+            
             .card-container { 
-                /* 寬度從 75vw 改為 65vw，讓卡片更窄 */
+                /* ★關鍵：這裡要強制停止 flex grow，不然會被撐大 */
+                flex: 0 0 auto !important;
+                
+                /* 設定你想要的窄寬度 */
                 width: 65vw !important; 
-                /* 高度從 55vh 改為 45vh，讓卡片更矮 */
+                max-width: 65vw !important;
+                
+                /* 設定變矮 */
                 height: 45vh; 
             }
             .filter-bar { padding-left: 15px; }
 
-            /* 配合卡片變小，稍微縮小文字與圖片佔比 */
             .word-text { font-size: 1.7em; }
             .card-img { height: 45%; }
         }
