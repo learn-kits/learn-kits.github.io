@@ -52,7 +52,7 @@
             border: none !important;
         }
 
-        /* Logo 區域 (修改版) */
+        /* Logo 區域 */
         .header-logo {
             display: flex;
             align-items: center;
@@ -61,12 +61,13 @@
             flex-shrink: 0;
         }
 
-        /* Logo 圖片樣式 */
+        /* Logo 圖片樣式 (預設電腦版) */
         .header-logo img {
-            height: 40px; /* 設定圖片高度，保留 header 上下空間 */
-            width: auto;  /* 寬度自動調整以維持比例 */
-            object-fit: contain; /* 確保圖片不會變形 */
+            height: 40px; /* 電腦版維持 40px */
+            width: auto;  
+            object-fit: contain;
             display: block;
+            transition: height 0.2s; /* 讓大小切換時有滑順效果 */
         }
 
         /* 電腦版導航選單 */
@@ -78,8 +79,8 @@
 
         .nav-item {
             color: #333 !important;
-            font-weight: 500;
-            font-size: 16px;
+            font-weight: 300;
+            font-size: 15px;
             cursor: pointer;
             position: relative;
             transition: color 0.2s;
@@ -175,11 +176,16 @@
             font-size: 15px !important;
         }
 
-        /* RWD */
+        /* RWD (手機版設定) */
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
             .mobile-menu-btn { display: block; }
             .mobile-nav-overlay.open { display: flex; }
+
+            /* ★★★ 修改處：手機版 Logo 變小 ★★★ */
+            .header-logo img {
+                height: 30px; /* 原本是 40px，這裡改小 */
+            }
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
