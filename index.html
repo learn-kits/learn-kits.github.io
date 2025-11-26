@@ -241,65 +241,91 @@
         }
         .error-msg { color: #EF4444; font-size: 0.9em; margin-top: 10px; text-align: center; }
 
-        /* ★★★ 手機版優化 ★★★ */
+/* ★★★ 手機版專屬：堆疊背景與拖曳動畫 (已縮小尺寸版) ★★★ */
         @media (max-width: 600px) {
-            .pagination { bottom: 20px; width: 85%; }
-            
-            .card-container { 
-                flex: 0 0 auto !important;
-                width: 80vw !important; 
-                max-width: 80vw !important;
-                height: 45vh; 
+            /* 1. 調整分頁控制列的位置與大小 */
+            .pagination { bottom: 25px; width: 80%; height: 50px; }
+            .pagination .material-icons { font-size: 28px !important; } /* 按鈕icon變小 */
+            .page-info { font-size: 1em; }
+
+            /* 2. 顯示堆疊背景 (尺寸縮小) */
+            .stack-background {
+                display: block;
+                position: absolute;
+                width: 72vw;        /* 縮小寬度 (原本80vw) */
+                max-width: 300px;   /* 縮小最大寬度 (原本340px) */
+                height: 42vh;       /* 縮小高度 (原本45vh) */
+                z-index: 0;
             }
             
-            .filter-bar { padding-left: 15px; }
+            .stack-layer {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(255, 255, 255, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                border-radius: 20px; /* 圓角稍微縮小 */
+                transition: transform 0.3s ease;
+            }
+            
+            /* 調整堆疊的錯落距離，因為卡片變小，距離也要變小才好看 */
+            .stack-layer:nth-child(1) { transform: translateY(8px) rotate(3deg) scale(0.95); z-index: 1; }
+            .stack-layer:nth-child(2) { transform: translateY(14px) rotate(-2deg) scale(0.9); z-index: 0; opacity: 0.7; }
 
-            .word-text { font-size: 1.7em; }
-            .card-img { height: 55%; }
+            /* 3. 卡片容器本體 (尺寸縮小) */
+            .card-container { 
+                flex: 0 0 auto !important;
+                position: absolute !important; 
+                z-index: 10;
+                
+                width: 72vw !important;      /* 配合背景寬度 */
+                max-width: 300px !important; /* 配合背景最大寬度 */
+                height: 42vh;                /* 配合背景高度 */
+            }
 
-            /* 手機版間距縮小為 8px */
-            .level-badge { top: 8px; left: 8px; }
-            .card-action-btn { top: 8px; }
+            /* 隱藏後面的卡片 */
+            #app .card-container ~ .card-container {
+                display: none;
+            }
+            
+            /* 4. 內容元素縮小 */
+            .filter-bar { padding-left: 15px; min-height: 50px; }
+            
+            /* 英文單字變小 */
+            .word-text { font-size: 1.5em; margin-top: 2px; } 
+            
+            /* 中文翻譯變小 */
+            .trans-text { font-size: 1.35em; line-height: 1.5; }
+            
+            /* KK音標變小 */
+            .kk-text { font-size: 0.95em; min-height: 20px; }
+            
+            /* 詞性標籤變小 */
+            .pos-text { font-size: 0.8em; padding: 3px 10px; }
+            
+            /* 圖片高度比例微調 */
+            .card-img { height: 52%; }
+
+            /* 左上角等級標籤變小 */
+            .level-badge { 
+                top: 8px; left: 8px; 
+                padding: 4px 10px; 
+                font-size: 0.7em; 
+                border-radius: 8px;
+            }
+
+            /* 右上角按鈕變小 */
+            .card-action-btn { 
+                top: 8px; 
+                width: 38px; height: 38px; /* 按鈕尺寸縮小 */
+                border-radius: 10px;
+            }
+            .card-action-btn .material-icons { font-size: 20px; } /* 按鈕內的icon縮小 */
+
             .btn-audio { right: 8px; }
-            .btn-dict { right: 60px; } 
+            .btn-dict { right: 54px; } /* 因為按鈕變小，間距也要調整 */
+            
+            /* 點擊提示文字 */
+            .hint-text { font-size: 0.75em; margin-top: 15px; }
         }
-
-/* --- 手機版專屬：堆疊背景與拖曳動畫 --- */
-@media (max-width: 600px) {
-    /* 1. 顯示堆疊背景 */
-    .stack-background {
-        display: block;
-        position: absolute;
-        /* 這裡的大小要跟你原本的手機版卡片大小一致 */
-        width: 80vw; 
-        max-width: 340px;
-        height: 45vh; /* 跟你原本的高度設定一致 */
-        z-index: 0;
-    }
-    
-    .stack-layer {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 24px;
-        transition: transform 0.3s ease;
-    }
-    
-    /* 兩層錯落的效果 */
-    .stack-layer:nth-child(1) { transform: translateY(10px) rotate(3deg) scale(0.95); z-index: 1; }
-    .stack-layer:nth-child(2) { transform: translateY(18px) rotate(-2deg) scale(0.9); z-index: 0; opacity: 0.7; }
-
-    /* 2. 讓目前的卡片浮在最上面 */
-    .card-container {
-        position: absolute !important; /* 為了疊在背景上 */
-        z-index: 10;
-        /* 確保只有第一張卡片顯示，避免重疊混亂 */
-    }
-/* 改用這個寫法：隱藏「位於其他卡片之後」的卡片，這樣就不會誤傷到第一張卡 */
-    #app .card-container ~ .card-container {
-        display: none;
-    }
-}
 
 /* 電腦版隱藏堆疊背景 */
 @media (min-width: 601px) {
