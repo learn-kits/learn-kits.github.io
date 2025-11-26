@@ -245,24 +245,12 @@
         @media (max-width: 600px) {
             .pagination { bottom: 20px; width: 85%; }
             
-            /* 卡片容器優化 */
-    .card-container { 
-        width: 80vw !important; 
-        max-width: 300px !important;
-        height: 50vh !important;
-        position: absolute; 
-        left: 0; right: 0; margin: auto; /* 強制水平置中 */
-        transform-origin: 50% 100%; /* 設定旋轉軸心在底部，擺動更像 Tinder */
-        will-change: transform, opacity; /* 效能優化 */
-    }
-
-    /* 拖曳時移除動畫過渡，讓卡片「黏」在手指上 */
-    .card-container.moving {
-        transition: none !important;
-    }
-            /* 隱藏多餘卡片 */
-    #app .card-container:not(:first-of-type) { display: none; }
-}
+            .card-container { 
+                flex: 0 0 auto !important;
+                width: 80vw !important; 
+                max-width: 80vw !important;
+                height: 45vh; 
+            }
             
             .filter-bar { padding-left: 15px; }
 
@@ -276,7 +264,7 @@
             .btn-dict { right: 60px; } 
         }
 
-        /* --- 手機版專屬：堆疊背景與拖曳動畫 --- */
+/* --- 手機版專屬：堆疊背景與拖曳動畫 --- */
 @media (max-width: 600px) {
     /* 1. 顯示堆疊背景 */
     .stack-background {
@@ -342,16 +330,17 @@
         </div>
     </div>
 
-    <div id="app">
-        
- <!-- ★★★ 新增這段 (堆疊背景) 開始 ★★★ -->
+<!-- 原本的程式碼 -->
+<div id="app">
+    
+    <!-- ★★★ 新增這段 (堆疊背景) 開始 ★★★ -->
     <div class="stack-background">
         <div class="stack-layer"></div>
         <div class="stack-layer"></div>
     </div>
     <!-- ★★★ 新增這段 結束 ★★★ -->
 
-    </div>
+</div>
     
     <div class="pagination" id="paginationControl">
         <button class="page-btn" onclick="changePage(-1)"><span class="material-icons" style="font-size: 32px;">chevron_left</span></button>
@@ -417,7 +406,7 @@
 
         async function fetchAllLevels() {
             const promises = LEVEL_CONFIG.map(config => {
-                const proxyUrl = `https://api.allorigins.win/raw?url=` + encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${config.gid}`);
+                const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${config.gid}`);
                 return fetch(proxyUrl)
                     .then(res => res.ok ? res.text() : Promise.reject())
                     .then(csvText => new Promise((resolve) => {
@@ -554,117 +543,72 @@
     renderPage();
 }
 
-// --- 請替換原本的 renderPage (確認有加入 initTinderSwipe) ---
-function renderPage() {
-    // ... (保留原本的前半段清空邏輯) ...
+        function renderPage() {
+            // 1. 先保留堆疊背景 (如果有的話)
     const stackBg = document.querySelector('.stack-background');
-    app.innerHTML = ''; 
-    if(isMobile && stackBg) app.appendChild(stackBg);
+    
+    app.innerHTML = ''; // 清空內容
+    
+    // 2. 如果原本有堆疊背景，把它加回來
+    if (stackBg) app.appendChild(stackBg);
 
     const total = Math.ceil(displayData.length / itemsPerPage);
-    if (displayData.length === 0) return; // ... (保留錯誤處理)
-    document.getElementById('pageInfo').innerText = `${currentPage} / ${total}`;
+    // ... (原本的程式碼繼續) ...
+            app.innerHTML = '';
+            const total = Math.ceil(displayData.length / itemsPerPage);
+            if (currentPage > total && total > 0) currentPage = 1;
 
-    const start = (currentPage - 1) * itemsPerPage;
-    const pageData = displayData.slice(start, start + itemsPerPage);
-
-    pageData.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'card-container';
-        
-        // ★★★ 關鍵：每張卡片都綁定新的拖曳邏輯 ★★★
-        if (isMobile) initTinderSwipe(div);
-
-        // ... (保留原本的 innerHTML 內容，完全不用動) ...
-        const kkId = `kk-${item.word}-${Math.random().toString(36).substr(2, 5)}`;
-        div.innerHTML = `...略 (請保留你原本的 HTML)...`;
-        
-        // ... (保留原本的 onclick 翻面邏輯) ...
-        div.querySelector('.card').addEventListener('click', function() {
-            if (!div.classList.contains('is-dragging')) { // 防止拖曳時誤觸翻面
-                this.classList.toggle('flipped');
+            if (displayData.length === 0) {
+                app.innerHTML = '<div style="color:#64748B; font-size: 1.2em; font-weight:500;">此分類無資料</div>';
+                document.getElementById('paginationControl').style.display = 'none';
+                return;
             }
-        });
+            document.getElementById('paginationControl').style.display = 'flex';
 
-        app.appendChild(div);
-        if (!phoneticCache[item.word]) fetchPhonetic(item.word, kkId);
-    });
-}
-
-// --- ★★★ 全新 Tinder 拖曳邏輯 (請貼上覆蓋舊的) ★★★ ---
-function initTinderSwipe(card) {
-    let isDragging = false;
-    let startX = 0, currentX = 0;
-    const threshold = 100; // 手指滑動超過 100px 就判定飛出
-
-    // 1. 手指按下去
-    card.addEventListener('touchstart', (e) => {
-        if (isAnimating) return;
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        
-        // 加入 moving class 讓 CSS 移除 transition，達到 0 延遲跟隨
-        card.classList.add('moving'); 
-    }, {passive: true});
-
-    // 2. 手指移動中
-    card.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        
-        currentX = e.touches[0].clientX;
-        const diffX = currentX - startX;
-        
-        // 旋轉角度：移動距離除以 20 (例如移動 200px -> 旋轉 10度)
-        const rotate = diffX / 20; 
-        
-        // 視差位移：加上一點點 Y 軸位移，讓卡片看起來是「被手指拖著走」
-        // 這裡設定 Y 軸不變或微幅移動，重點是 X 軸和旋轉
-        card.style.transform = `translateX(${diffX}px) rotate(${rotate}deg)`;
-        
-        // 標記狀態，避免觸發 click 翻面
-        if (Math.abs(diffX) > 5) card.classList.add('is-dragging');
-        
-    }, {passive: true});
-
-    // 3. 手指放開
-    card.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        card.classList.remove('moving'); // 加回 CSS transition 以便播放飛出動畫
-
-        const diffX = currentX - startX;
-        const keep = Math.abs(diffX) < threshold; // 是否保留卡片 (沒滑超過門檻)
-
-        if (keep) {
-            // --- 回彈 (Spring Back) ---
-            card.style.transform = ''; // 清除所有變形，回歸 CSS 定位
-            setTimeout(() => card.classList.remove('is-dragging'), 200);
-        } else {
-            // --- 飛出 (Fly Out) ---
-            isAnimating = true;
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = displayData.slice(start, start + itemsPerPage);
             
-            // 判斷方向
-            // 往右滑 (diffX > 0) -> 上一頁 (dir = -1)
-            // 往左滑 (diffX < 0) -> 下一頁 (dir = 1)
-            const dir = diffX > 0 ? -1 : 1; 
-            
-            // 設定飛出終點：螢幕寬度之外，且往上飛 (rotate 加大)
-            const endX = (window.innerWidth + 200) * (diffX > 0 ? 1 : -1);
-            const endY = -100; // 稍微往上飛
-            const endRotate = (diffX > 0 ? 1 : -1) * 45; // 旋轉 45 度
+            document.getElementById('pageInfo').innerText = `${currentPage} / ${total}`;
+            document.querySelectorAll('.page-btn')[0].disabled = (currentPage === 1);
+            document.querySelectorAll('.page-btn')[1].disabled = (currentPage === total);
 
-            card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
-            card.style.transform = `translate(${endX}px, ${endY}px) rotate(${endRotate}deg)`;
-            card.style.opacity = '0';
+            pageData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'card-container';
+                // ★★★ 加入這一行 (只有手機版啟用) ★★★
+    if (window.innerWidth <= 600) initTinderSwipe(div);
 
-            // 動畫結束後切換資料
-            setTimeout(() => {
-                changePage(dir); 
-                isAnimating = false;
-            }, 300); // 等待 0.3 秒動畫
+                const kkId = `kk-${item.word}-${Math.random().toString(36).substr(2, 5)}`;
+
+                div.innerHTML = `
+                    <div class="card">
+                        <div class="card-face card-front">
+                            <div class="level-badge" style="background:${getLevelColor(item.level)}">${item.level}</div>
+                            <a href="https://dictionary.cambridge.org/dictionary/english-chinese-traditional/${item.word.toLowerCase()}" 
+                               target="_blank" class="card-action-btn btn-dict" onclick="event.stopPropagation()"
+                               title="查詢 Cambridge Dictionary"><span class="material-icons">menu_book</span></a>
+                            <button class="card-action-btn btn-audio" onclick="playAudio(event, '${item.word}')" title="播放發音">
+                                <span class="material-icons">volume_up</span>
+                            </button>
+                            <img src="${item.img}" alt="${item.word}" class="card-img" loading="lazy" onerror="this.src='https://dummyimage.com/400x300/f1f5f9/cbd5e1&text=${item.word}'">
+                            <div class="text-area">
+                                <div class="word-text">${item.word}</div>
+                                ${item.pos ? `<div class="pos-text">${item.pos}</div>` : ''}
+                                <div class="kk-text" id="${kkId}">${phoneticCache[item.word] ? phoneticCache[item.word] : '...'}</div>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="trans-text">${item.trans}</div>
+                            <div class="hint-text">TAP TO FLIP BACK</div>
+                        </div>
+                    </div>
+                `;
+                div.querySelector('.card').onclick = function() { this.classList.toggle('flipped'); };
+                app.appendChild(div);
+
+                if (!phoneticCache[item.word]) fetchPhonetic(item.word, kkId);
+            });
         }
-    });
-}
 
         async function fetchPhonetic(word, elementId) {
             try {
@@ -693,7 +637,71 @@ function initTinderSwipe(card) {
             }
         }
 
-    
+       // ★★★ Tinder 拖曳邏輯核心 ★★★
+function initTinderSwipe(cardContainer) {
+    let startX = 0, currentX = 0, isDragging = false;
+    const threshold = 100; // 手指滑動超過 100px 就飛走
+
+    cardContainer.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        // 拖曳時移除過渡動畫，讓卡片緊跟手指
+        cardContainer.style.transition = 'none'; 
+    }, {passive: true});
+
+    cardContainer.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+        
+        // 計算旋轉與位移
+        // diffX > 0 (往右) -> 角度正 (順時針)
+        // diffX < 0 (往左) -> 角度負 (逆時針)
+        const rotate = diffX * 0.05; 
+        
+        // ★ 往右上/左上斜飛的效果：
+        // 加上 translateY(負值)，讓卡片隨左右移動時也稍微往上浮
+        const liftY = -Math.abs(diffX) * 0.2; 
+
+        cardContainer.style.transform = `translate(${diffX}px, ${liftY}px) rotate(${rotate}deg)`;
+        
+        // 標記正在拖曳 (防止誤觸 click 翻面)
+        if (Math.abs(diffX) > 5) cardContainer.classList.add('is-dragging');
+    }, {passive: true});
+
+    cardContainer.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = currentX - startX;
+
+        // 放手後，加回過渡動畫，讓動作滑順
+        cardContainer.style.transition = 'transform 0.4s ease-out, opacity 0.4s';
+
+        if (Math.abs(diffX) > threshold) {
+            // --- 飛走邏輯 ---
+            const dir = diffX > 0 ? 1 : -1; // 1=往右, -1=往左
+            
+            // 設定飛出的終點 (螢幕寬度的 1.5 倍，加上往上飛)
+            const flyX = dir * window.innerWidth * 1.5;
+            const flyY = -200; // 往上飛出螢幕
+            
+            cardContainer.style.transform = `translate(${flyX}px, ${flyY}px) rotate(${dir * 45}deg)`;
+            cardContainer.style.opacity = '0'; // 漸隱
+
+            // 等動畫跑完後，切換頁面
+            setTimeout(() => {
+                // 這裡定義：往左滑(dir=-1)是下一頁，往右滑(dir=1)是上一頁
+                // changePage(1) = 下一頁
+                // changePage(-1) = 上一頁
+                changePage(dir > 0 ? -1 : 1); 
+            }, 300);
+        } else {
+            // --- 回彈邏輯 ---
+            cardContainer.style.transform = ''; // 清除位移，回到原點
+            setTimeout(() => cardContainer.classList.remove('is-dragging'), 100);
+        }
+    });
+}
 
 // ★★★ Tinder 拖曳邏輯核心 ★★★
 function initTinderSwipe(cardContainer) {
@@ -769,7 +777,7 @@ function initTinderSwipe(cardContainer) {
             };
         });
 
-        
+       
     </script>
 </body>
 </html>
