@@ -417,7 +417,7 @@
 
         async function fetchAllLevels() {
             const promises = LEVEL_CONFIG.map(config => {
-                const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${config.gid}`);
+                const proxyUrl = `https://api.allorigins.win/raw?url=` + encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${config.gid}`);
                 return fetch(proxyUrl)
                     .then(res => res.ok ? res.text() : Promise.reject())
                     .then(csvText => new Promise((resolve) => {
