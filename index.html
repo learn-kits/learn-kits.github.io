@@ -295,7 +295,8 @@
         z-index: 10;
         /* 確保只有第一張卡片顯示，避免重疊混亂 */
     }
-    #app .card-container:not(:first-of-type) {
+/* 改用這個寫法：隱藏「位於其他卡片之後」的卡片，這樣就不會誤傷到第一張卡 */
+    #app .card-container ~ .card-container {
         display: none;
     }
 }
