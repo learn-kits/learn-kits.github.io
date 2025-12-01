@@ -390,44 +390,71 @@
             else if (event.keyCode === 38) playerRotate(1);
         });
 
+// --- 2. 手機觸控控制 (優化版：支援即時拖曳下滑) ---
         let touchStartX = 0;
         let touchStartY = 0;
-        let isTouching = false;
+        let isSwiping = false; // 用來判斷是否正在滑動
 
         canvas.addEventListener('touchstart', e => {
             e.preventDefault();
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
-            isTouching = true;
+            isSwiping = false; // 重置滑動狀態
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault(); // 防止畫面捲動
+            
+            if (!player.matrix) return; // 避免未初始化錯誤
+
+            const touchCurrentX = e.touches[0].clientX;
+            const touchCurrentY = e.touches[0].clientY;
+            
+            const diffY = touchCurrentY - touchStartY;
+            const diffX = touchCurrentX - touchStartX;
+
+            // ★ 下滑邏輯優化：
+            // 只要垂直移動超過 30px，且垂直幅度大於水平幅度，就觸發「落下」
+            // 並且重置 startY，這樣手指繼續往下拖，就會連續加速落下
+            if (diffY > 30 && Math.abs(diffY) > Math.abs(diffX)) {
+                playerDrop();
+                touchStartY = touchCurrentY; // 重置起點，實現連續拖曳
+                isSwiping = true; // 標記為正在滑動，避免手指放開時誤觸點擊
+            }
         }, {passive: false});
 
         canvas.addEventListener('touchend', e => {
-            if (!isTouching) return;
             e.preventDefault();
             
+            // 如果剛剛發生過「滑動(下滑加速)」，手指放開時就什麼都不做
+            if (isSwiping) return;
+
+            // --- 點擊 (Tap) 邏輯 ---
+            // 如果沒有滑動，才執行左右移動或旋轉
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
+            
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // 為了避免誤觸，點擊判斷稍微嚴格一點 (位移小於 10px 才算點擊)
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
-            
-            if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
-                const screenWidth = window.innerWidth;
-                const tapX = touchEndX;
-                const tapY = touchEndY;
 
-                if (tapY < window.innerHeight * 0.4) {
+            if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+                // 點擊上半部 (40%區域)：旋轉
+                if (touchEndY < screenHeight * 0.4) {
                     playerRotate(1);
-                } else if (tapX < screenWidth / 2) {
+                } 
+                // 點擊左半部：左移
+                else if (touchEndX < screenWidth / 2) {
                     playerMove(-1);
-                } else {
+                } 
+                // 點擊右半部：右移
+                else {
                     playerMove(1);
                 }
-            } else {
-                if (diffY > 50 && Math.abs(diffY) > Math.abs(diffX)) {
-                    playerDrop();
-                }
             }
-            isTouching = false;
         }, {passive: false});
 
         window.addEventListener('resize', resize);
