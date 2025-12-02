@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="https://learn-kits.github.io/image/learnkits_favicon.png">
     <link rel="apple-touch-icon" href="https://learn-kits.github.io/image/learnkits_favicon.png">
 
-    <!-- 字體：只引入 Regular(400) 和 Medium(500) -->
+    <!-- 字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
@@ -20,25 +20,22 @@
     <style>
         :root {
             /* --- 極簡瑞士風格配色 --- */
-            --bg-body: #F7F9FC;        /* 極淡的冷灰藍底色 */
+            --bg-body: #F7F9FC;
             --bg-card: #FFFFFF;
             
-            /* 核心主色：寶藍色 (但應用得更克制) */
+            /* 核心主色：寶藍色 */
             --primary-blue: #0056D2;   
-            --primary-light-bg: rgba(0, 86, 210, 0.06); /* 篩選器底色 */
+            --primary-light-bg: rgba(0, 86, 210, 0.06);
             
-            --text-main: #2F3136;      /* 深灰，不使用純黑 */
+            --text-main: #2F3136;
             --text-sub: #888888;
             
-            /* 極致設定 */
-            --border-radius: 1px;      /* 幾乎無圓角 */
-            --border-width: 1px;       /* 極細線 */
-            --border-color: #EAEAEA;   /* 極淡邊框 */
+            --border-radius: 1px;
+            --border-width: 1px;
+            --border-color: #EAEAEA;
             
-            /* 陰影：僅用於卡片本體，極度擴散且淡 */
             --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
             
-            /* 字體 */
             --font-main: 'Noto Sans TC', sans-serif;
             --font-eng: 'Outfit', sans-serif;
         }
@@ -54,7 +51,13 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            font-weight: 400; /* 預設細字 */
+            font-weight: 400;
+
+            /* ★ 新增：淺淺的藍色背景格紋 ★ */
+            background-image: 
+                linear-gradient(rgba(0, 86, 210, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 86, 210, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         #header-container {
@@ -63,7 +66,6 @@
             z-index: 1001;  
             position: relative; 
             background-color: #fff;
-            /* Header 底線也移除，或用極淡線 */
             border-bottom: 1px solid rgba(0,0,0,0.03); 
         }
 
@@ -78,19 +80,18 @@
             width: 40px; height: 40px; 
             border: 2px solid #ddd; 
             border-top: 2px solid var(--primary-blue); 
-            border-radius: 50%; /* Loading 保持圓形比較自然 */
+            border-radius: 50%;
             animation: spin 0.8s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- 篩選區塊 (藍色透明底 + 白色方塊按鈕) --- */
+        /* --- 篩選區塊 --- */
         .filter-container {
-            background-color: var(--primary-light-bg); /* 藍色透明底 */
+            background-color: var(--primary-light-bg);
             width: 100%; z-index: 100;
             display: flex; flex-direction: column; align-items: center;
             padding: 16px 0; 
             flex-shrink: 0; 
-            /* 不加邊框，靠色塊區分 */
         }
 
         .filter-bar {
@@ -103,11 +104,11 @@
         
         .filter-btn {
             flex: 0 0 auto; 
-            background: #fff; /* 白色填滿 */
+            background: #fff;
             color: var(--text-sub);
-            border: none; /* 無邊框 */
+            border: none;
             width: 32px; height: 32px; 
-            border-radius: var(--border-radius); /* 1px 圓角 */
+            border-radius: var(--border-radius);
             cursor: pointer; 
             font-weight: 500; 
             font-family: var(--font-eng); font-size: 14px; 
@@ -116,7 +117,7 @@
         }
         .filter-btn:hover { color: var(--primary-blue); }
         .filter-btn.active { 
-            background: var(--primary-blue); /* 選中變藍色 */
+            background: var(--primary-blue);
             color: #fff; 
         }
 
@@ -125,11 +126,11 @@
             gap: 6px; padding: 8px 15px 0 15px; box-sizing: border-box;
         }
         .level-btn {
-            background: #fff; /* 白色填滿 */
+            background: #fff;
             color: var(--text-sub);
-            border: none; /* 無邊框 */
+            border: none;
             padding: 6px 16px; 
-            border-radius: var(--border-radius); /* 1px 圓角 */
+            border-radius: var(--border-radius);
             cursor: pointer; font-size: 13px; font-weight: 400;
             font-family: var(--font-eng); transition: all 0.2s;
             letter-spacing: 0.5px;
@@ -175,74 +176,73 @@
         
         .card-face { 
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
-            border-radius: var(--border-radius); /* 1px 圓角 */
+            border-radius: var(--border-radius);
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             background: var(--bg-card); 
             box-sizing: border-box; 
-            
-            /* ★ 極簡設計：無邊框，靠柔和陰影浮起 ★ */
             border: none;
             box-shadow: var(--shadow-soft); 
             overflow: hidden; 
         }
         .card-front { z-index: 2; }
         
-        /* Level 標籤：極簡化 */
+        /* ★ Level 標籤：改為實心藍底白字，確保可見 ★ */
         .level-badge {
-            position: absolute; top: 20px; left: 20px; 
-            padding: 0; /* 移除 padding，改用純文字 */
-            color: #bbb; /* 極淡灰色 */
+            position: absolute; top: 16px; left: 16px; 
+            padding: 4px 10px;
+            background: var(--primary-blue); 
+            color: #fff;
             font-size: 12px; font-weight: 500; 
             font-family: var(--font-eng);
             z-index: 10;
             letter-spacing: 1px;
-            /* 無背景、無邊框 */
+            border-radius: var(--border-radius);
         }
 
-        /* 操作按鈕：極簡圖示 */
+        /* ★ 操作按鈕：改為實心白底，避免與圖片打架 ★ */
         .card-action-btn { 
             position: absolute; top: 12px; 
-            background: transparent; 
-            border: none; /* 無邊框 */
+            background: #fff; /* 實心白底 */
+            border: none;
             width: 40px; height: 40px; 
             border-radius: var(--border-radius); 
             cursor: pointer; display: flex; 
             align-items: center; justify-content: center; 
-            color: #ccc; /* 預設淡灰 */
+            color: var(--primary-blue); /* 藍色圖示 */
             z-index: 20; transition: all 0.2s;
             text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 微微陰影增加層次 */
         }
         .card-action-btn:hover { 
-            color: var(--primary-blue); background-color: #f9f9f9;
+            background-color: var(--primary-blue);
+            color: #fff;
         }
         
         .btn-audio { right: 10px; }
-        .btn-dict { right: 50px; } 
+        .btn-dict { right: 56px; } 
         
         .card-img { 
             width: 100%; height: 45%; object-fit: cover; 
             margin-top: 0;
-            /* 圖片本身也不加邊框 */
-            opacity: 0.95;
+            opacity: 1; /* 恢復不透明，因為按鈕已經有底色了 */
         }
         
         .text-area { 
             padding: 20px; display: flex; flex-direction: column; 
             align-items: center; width: 100%; flex: 1; justify-content: center; 
-            /* 移除所有線條背景 */
         }
+        /* ★ 單字顏色改為藍色 ★ */
         .word-text { 
             font-family: var(--font-eng);
-            font-size: 2.4em; font-weight: 500; /* Medium */
-            color: var(--text-main); 
+            font-size: 2.4em; font-weight: 500; 
+            color: var(--primary-blue); /* 改藍色 */
             margin: 5px 0 0 0; text-align: center; letter-spacing: -0.5px;
         }
         .pos-text { 
             font-size: 0.85em; color: var(--text-sub); 
             font-weight: 400; font-style: italic;
             background: transparent; padding: 0; margin: 8px 0;
-            /* 移除底色塊 */
         }
         .kk-text { 
             font-size: 1rem; color: #aaa; font-family: var(--font-eng); 
@@ -257,7 +257,7 @@
         }
         .trans-text { 
             font-family: var(--font-main);
-            font-size: 1.8em; font-weight: 500; /* Medium */
+            font-size: 1.8em; font-weight: 500;
             color: var(--text-main); 
             line-height: 1.6; width: 100%; 
             background: transparent; padding: 0; border: none; box-shadow: none;
@@ -268,32 +268,38 @@
             font-weight: 400; letter-spacing: 1px; text-transform: uppercase;
         }
 
-        /* --- Pagination (底部切換區) --- */
+        /* --- Pagination (底部切換區) 改版 --- */
         .pagination { 
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: auto; min-width: 160px; height: 50px; padding: 5px; 
-            border-radius: var(--border-radius); /* 1px 圓角 */
+            border-radius: var(--border-radius);
             display: flex; align-items: center; justify-content: center; gap: 10px; 
             
-            /* 背景與篩選器一致 */
-            background: var(--primary-light-bg); 
-            /* 無邊框，無陰影 (或極淡) */
+            /* ★ 改為白底藍框 ★ */
+            background: #fff; 
+            border: 1px solid var(--primary-blue);
             z-index: 999;
         }
         .page-btn { 
-            background: #fff; /* 白色填滿 */
+            background: transparent;
             border: none; cursor: pointer; 
-            color: var(--text-main); 
+            color: var(--primary-blue); /* 藍色箭頭 */
             width: 40px; height: 40px;
             border-radius: var(--border-radius); 
             display: flex; align-items: center; justify-content: center; transition: all 0.2s; 
         }
-        .page-btn:hover:not(:disabled) { color: var(--primary-blue); }
-        .page-btn:active:not(:disabled) { background: #f0f0f0; }
-        .page-btn:disabled { color: #ccc; cursor: not-allowed; opacity: 0.5; }
+        .page-btn:hover:not(:disabled) { background: var(--primary-light-bg); }
+        .page-btn:disabled { color: #ddd; cursor: not-allowed; }
         
+        /* Material Icons 設定：箭頭大小 */
+        .page-btn .material-icons {
+            font-size: 28px; /* 稍微大一點的實心箭頭 */
+        }
+
         .page-info { 
-            font-weight: 500; color: var(--text-main); font-size: 1em; 
+            font-weight: 500; 
+            color: var(--primary-blue); /* 藍色文字 */
+            font-size: 1em; 
             min-width: 60px; text-align: center; font-family: var(--font-eng); 
         }
         .error-msg { color: #E53935; font-size: 0.9em; margin-top: 10px; text-align: center; }
@@ -301,7 +307,7 @@
 /* ★★★ 手机版专属设定 ★★★ */
         @media (max-width: 600px) {
             .pagination { bottom: 25px; width: auto; height: 46px; }
-            .pagination .material-icons { font-size: 20px !important; }
+            .pagination .material-icons { font-size: 24px !important; }
             
             /* 堆叠背景 - 極簡化，只留一點點層次 */
             .stack-background {
@@ -317,7 +323,7 @@
                 transition: transform 0.3s ease;
             }
             .stack-layer:nth-child(1) { transform: translateY(8px) scale(0.96); z-index: 1; opacity: 0.6; }
-            .stack-layer:nth-child(2) { display: none; /* 手機版只留一層堆疊，更乾淨 */ }
+            .stack-layer:nth-child(2) { display: none; }
 
             .card-container { 
                 flex: 0 0 auto !important; position: absolute !important; z-index: 10;
@@ -332,7 +338,7 @@
             
             .card-action-btn { width: 36px; height: 36px; }
             .card-action-btn .material-icons { font-size: 20px; }
-            .btn-dict { right: 50px; }
+            .btn-dict { right: 54px; } /* 稍微調整間距 */
         }
 
 @media (min-width: 601px) {
@@ -372,10 +378,11 @@
     </div>
 </div>
     
+    <!-- ★ 底部切換區：圖示改為實心三角形 arrow_left / arrow_right ★ -->
     <div class="pagination" id="paginationControl">
-        <button class="page-btn" onclick="changePage(-1)"><span class="material-icons">arrow_back</span></button>
+        <button class="page-btn" onclick="changePage(-1)"><span class="material-icons">arrow_left</span></button>
         <span class="page-info" id="pageInfo">- / -</span>
-        <button class="page-btn" onclick="changePage(1)"><span class="material-icons">arrow_forward</span></button>
+        <button class="page-btn" onclick="changePage(1)"><span class="material-icons">arrow_right</span></button>
     </div>
 
 <script>
@@ -395,9 +402,8 @@
 
     const generateImgUrl = (word) => `https://tse2.mm.bing.net/th?q=${encodeURIComponent(word)}&w=400&h=300&c=7&rs=1&p=0`;
 
-    // 因為卡片已經極簡化，這裡回傳空字串或簡單顏色即可，不再需要複雜的 Badge 顏色
     const getLevelColor = (levelStr) => {
-        return '#888'; // 統一為灰色
+        return '#888'; 
     };
 
     let fullVocabData = [], displayData = [], currentLetter = 'A', currentLevel = 'All', currentPage = 1, itemsPerPage = 4;
@@ -546,9 +552,8 @@
     function updateLevelBtnUI() {
         document.querySelectorAll('#levelFilterBar .level-btn').forEach(btn => {
             const targetText = btn.innerText;
-            // 簡化顯示 LV.
             let displayLevel = currentLevel;
-            if (currentLevel !== 'All') displayLevel = currentLevel; // 保持原樣或替換
+            if (currentLevel !== 'All') displayLevel = currentLevel;
             
             if (btn.innerText === displayLevel) btn.classList.add('active');
             else btn.classList.remove('active');
@@ -617,9 +622,9 @@
                         <div class="level-badge">${item.level.replace('Level ', 'LV.')}</div>
                         <a href="https://dictionary.cambridge.org/dictionary/english-chinese-traditional/${item.word.toLowerCase()}" 
                            target="_blank" class="card-action-btn btn-dict" onclick="event.stopPropagation()"
-                           title="翻閱字典"><span class="material-icons" style="font-size:18px;">menu_book</span></a>
+                           title="翻閱字典"><span class="material-icons">menu_book</span></a>
                         <button class="card-action-btn btn-audio" onclick="playAudio(event, '${item.word}')" title="聆聽發音">
-                            <span class="material-icons" style="font-size:20px;">volume_up</span>
+                            <span class="material-icons">volume_up</span>
                         </button>
                         <img src="${item.img}" alt="${item.word}" class="card-img" loading="lazy" onerror="this.src='https://dummyimage.com/400x300/f5f5f5/cccccc&text=${item.word}'">
                         <div class="text-area">
