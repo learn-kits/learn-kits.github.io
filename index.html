@@ -15,16 +15,18 @@
 
     <style>
         :root {
-            --bg-body: #F0F2F5;
+            --bg-body: #F2F4F8; /* 稍微偏冷灰的背景，讓白色卡片更跳 */
             --bg-card: #FFFFFF;
             --primary: #0056D2; 
-            --status-green: #34C759;
-            --status-yellow: #FFCC00;
-            --status-red: #FF3B30;
-            --text-dark: #2F3136;
-            --text-grey: #888;
-            --card-radius: 24px;
-            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --text-dark: #1A1C1E;
+            --text-grey: #8E9093;
+            
+            --card-radius: 28px; /* 加大圓角 */
+            --bar-radius: 100px; /* 膠囊狀圓角 */
+            
+            --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.06);
+            --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.04);
+
             --font-main: 'Noto Sans TC', sans-serif;
             --font-eng: 'Outfit', sans-serif;
         }
@@ -36,98 +38,102 @@
             height: 100vh; height: 100dvh;
             overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            background-image: radial-gradient(#d1d4d9 1px, transparent 1px);
-            background-size: 20px 20px;
+            /* 移除原本的網點背景，改用純淨色塊風格 */
         }
 
+        /* --- Header 容器 (保留位置給外部載入的 Header) --- */
         #header-container {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 100;
-            background: transparent !important; pointer-events: none;
+            height: 80px; /* 預留高度 */
+            pointer-events: none;
         }
         #header-container * { pointer-events: auto; }
 
-        /* 頂部資訊欄 */
-        .info-bar {
-            width: 90vw; max-width: 1200px;
-            margin-top: 70px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: flex-end;
-            z-index: 50;
-        }
-        .filter-status {
-            font-family: var(--font-eng); font-weight: 800;
-            color: var(--text-dark); font-size: 1.8rem;
-            line-height: 1; letter-spacing: -0.5px; text-transform: capitalize;
-        }
-        .filter-sub {
-            font-size: 0.9rem; color: var(--text-grey); font-weight: 600;
-            margin-top: 4px; display: block;
-        }
-        .hud-trigger-inline {
-            width: 40px; height: 40px;
-            background: #fff; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
-            color: var(--text-dark); margin-bottom: 4px;
-        }
-
-        /* --- Grid 佈局系統 (響應式核心) --- */
+        /* --- 主要內容區塊 --- */
         #app {
             width: 100%; flex: 1;
-            display: flex; justify-content: center; align-items: flex-start; 
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start;
+            padding-top: 100px; /* 避開 Header，保留呼吸空間 */
             position: relative;
             overflow: hidden;
         }
 
-        /* 
-           調整：手機版預設尺寸 
-           Width: 70vw (比原本 90vw 少約 20%)
-           Height: 50vh (比原本 55vh 少約 5%)
-        */
+        /* 1. 大標題 */
+        .page-title {
+            width: 90vw; max-width: 1200px;
+            font-family: var(--font-eng);
+            font-weight: 800;
+            font-size: 2.4rem;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            padding-left: 10px; /* 微調對齊 */
+            text-align: left;
+            line-height: 1.1;
+        }
+
+        /* 2. 篩選欄位 (仿搜尋列風格) */
+        .filter-bar {
+            width: 85vw; max-width: 360px; /* 手機版寬度 */
+            height: 56px;
+            background: rgba(255, 255, 255, 0.6); /* 半透明白 */
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--bar-radius);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 30px; /* 與下方卡片的距離 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .filter-bar:active { transform: scale(0.98); background: rgba(255,255,255,0.8); }
+
+        .filter-content { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .filter-icon { color: var(--text-dark); font-size: 24px; }
+        .filter-text {
+            font-family: var(--font-eng); font-weight: 600;
+            color: var(--text-dark); font-size: 1.1rem;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .filter-arrow { color: var(--text-grey); font-size: 24px; }
+
+        /* 平板以上調整寬度 */
+        @media (min-width: 768px) {
+            .filter-bar { width: 90vw; max-width: 1200px; margin-bottom: 40px; }
+            .page-title { margin-bottom: 30px; }
+        }
+
+        /* --- 3. Grid 卡片容器 --- */
         .grid-container {
             display: grid;
-            width: 70vw; /* 手機版變窄 */
-            height: 50vh; min-height: 400px; /* 手機版變矮 */
+            width: 70vw; /* 手機版寬度 (依需求縮小) */
+            height: 50vh; min-height: 400px;
             grid-template-columns: 1fr; 
             gap: 20px;
             perspective: 1000px;
             justify-items: center;
         }
 
-        /* 平板版 (>= 768px): 恢復寬度，顯示 2 欄 */
+        /* 平板 & 電腦版寬度 */
         @media (min-width: 768px) {
-            .grid-container {
-                width: 90vw; /* 恢復較寬的版面 */
-                grid-template-columns: 1fr 1fr;
-                height: 60vh; min-height: 500px;
-            }
+            .grid-container { width: 90vw; grid-template-columns: 1fr 1fr; height: 55vh; }
         }
-
-        /* 電腦版 (>= 1024px): 3 欄 */
         @media (min-width: 1024px) {
-            .grid-container {
-                width: 90vw; max-width: 1200px;
-                grid-template-columns: 1fr 1fr 1fr;
-                height: 65vh;
-            }
+            .grid-container { width: 90vw; max-width: 1200px; grid-template-columns: 1fr 1fr 1fr; height: 60vh; }
         }
 
-        /* 單張卡片容器 */
-        .card-wrapper {
-            width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-        }
+        /* 單張卡片 */
+        .card-wrapper { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
 
         .card {
             width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
+            position: relative; transform-style: preserve-3d;
             transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             border-radius: var(--card-radius);
             box-shadow: var(--shadow-card);
             user-select: none; -webkit-user-select: none;
         }
-        /* CSS 控制翻轉 */
         .card.flipped { transform: rotateY(180deg); }
 
         .card-face {
@@ -140,113 +146,94 @@
             touch-action: none; 
         }
 
-        /* 正面 */
         .front-face { z-index: 2; }
-
-        /* 上半部：圖片 */
+        
         .visual-wrapper {
             flex: 1.2; width: 100%; position: relative;
             background: #f0f0f0; overflow: hidden;
-            border-top-left-radius: var(--card-radius);
-            border-top-right-radius: var(--card-radius);
-            border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+            border-radius: 0; /* 圖片區不需圓角，由父層 overflow 裁切 */
             isolation: isolate;
         }
-        .word-image {
-            width: 100%; height: 100%; object-fit: cover;
-            display: block; pointer-events: none;
-        }
+        .word-image { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 
         /* 右上角獨立按鈕 */
         .action-cluster-float {
-            position: absolute; top: 12px; right: 12px; z-index: 20;
+            position: absolute; top: 16px; right: 16px; z-index: 20;
             display: flex; gap: 8px;
         }
         .action-circle {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary); text-decoration: none; cursor: pointer;
-            border: none;
-            transition: transform 0.2s, background 0.2s;
+            color: var(--text-dark); text-decoration: none; cursor: pointer;
+            border: none; transition: transform 0.2s;
         }
         .action-circle:active { transform: scale(0.9); }
-        .action-circle:hover { background: #F5F5F5; }
-        .action-circle .material-icons { font-size: 20px; }
 
-
-        /* 下半部：文字 */
+        /* 底部內容 */
         .bottom-content {
             flex: 1; width: 100%; padding: 16px 20px; box-sizing: border-box;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; background: #fff;
-            border-bottom-left-radius: var(--card-radius); border-bottom-right-radius: var(--card-radius);
         }
         .level-pill {
             font-family: var(--font-eng); font-size: 10px; font-weight: 700;
-            color: var(--text-grey); background: #F5F5F5;
-            padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; margin-bottom: 6px;
+            color: var(--text-grey); background: #F5F7FA;
+            padding: 4px 12px; border-radius: 20px; letter-spacing: 1px; margin-bottom: 8px;
         }
         .main-word {
-            font-family: var(--font-eng); font-weight: 800; font-size: 2.2rem;
-            color: var(--primary); line-height: 1.1; margin-bottom: 4px;
+            font-family: var(--font-eng); font-weight: 800; font-size: 2rem;
+            color: var(--text-dark); line-height: 1.1; margin-bottom: 4px;
         }
         .kk-row {
-            font-family: var(--font-eng); color: #AAA; font-size: 0.9rem;
+            font-family: var(--font-eng); color: #999; font-size: 0.9rem;
             display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 16px;
         }
-        /* 狀態按鈕 */
-        .status-row {
-            display: flex; gap: 20px; justify-content: center; align-items: center; width: 100%;
-        }
+        .status-row { display: flex; gap: 20px; justify-content: center; align-items: center; width: 100%; }
         .status-btn {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 48px; height: 48px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s; font-size: 24px;
-            border: 1px solid rgba(0,0,0,0.05); background: #fff;
+            border: 1px solid #eee; background: #fff;
         }
         .status-btn:active { transform: scale(0.9); }
-        .status-btn.green { background: #E8F5E9; color: #2E7D32; }   
-        .status-btn.yellow { background: #FFF8E1; color: #F57F17; }  
-        .status-btn.red { background: #FFEBEE; color: #C62828; }    
-        .status-btn.green.active { background: var(--status-green); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3); }
-        .status-btn.yellow.active { background: var(--status-yellow); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3); }
-        .status-btn.red.active { background: var(--status-red); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3); }
+        .status-btn.green { color: #2E7D32; background: #F1F8E9; border-color: transparent; }   
+        .status-btn.yellow { color: #F9A825; background: #FFFDE7; border-color: transparent; }  
+        .status-btn.red { color: #C62828; background: #FFEBEE; border-color: transparent; }    
+        
+        .status-btn.green.active { background: var(--status-green); color: #fff; box-shadow: 0 6px 16px rgba(52, 199, 89, 0.4); }
+        .status-btn.yellow.active { background: var(--status-yellow); color: #fff; box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4); }
+        .status-btn.red.active { background: var(--status-red); color: #fff; box-shadow: 0 6px 16px rgba(255, 59, 48, 0.4); }
 
-        /* 反面 */
         .back-face {
             background: var(--primary); transform: rotateY(180deg);
             padding: 30px; box-sizing: border-box;
             justify-content: center; align-items: center; text-align: center;
         }
-        .trans-text {
-            font-size: 1.6rem; font-weight: 500; color: #FFFFFF; margin-bottom: 20px;
-        }
-        .hint-text {
-            font-family: var(--font-eng); font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);
-            letter-spacing: 1px; text-transform: uppercase;
-        }
+        .trans-text { font-size: 1.6rem; font-weight: 500; color: #FFFFFF; margin-bottom: 20px; }
+        .hint-text { font-family: var(--font-eng); font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); letter-spacing: 1px; text-transform: uppercase; }
 
-        /* 導航 */
+        /* --- 4. 底部導航按鈕 (修改：半透明淡色) --- */
         .nav-controls {
             position: fixed; bottom: 30px;
-            display: flex; align-items: center; gap: 24px; z-index: 90;
+            display: flex; align-items: center; gap: 30px; z-index: 90;
         }
         .nav-btn {
-            width: 56px; height: 56px; border-radius: 50%; border: none;
-            background: #fff; color: var(--text-dark);
-            box-shadow: 0 6px 16px rgba(0,86,210,0.15);
+            width: 60px; height: 60px; border-radius: 50%; border: none;
+            /* 修改：半透明白，讓卡片更突出 */
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(8px);
+            color: var(--text-dark);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s;
+            cursor: pointer; transition: transform 0.2s, background 0.2s;
         }
-        .nav-btn:active { transform: scale(0.9); }
-        .page-counter {
-            font-family: var(--font-eng); font-weight: 700; color: var(--text-grey); font-size: 16px;
-        }
+        .nav-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.8); }
+        .page-counter { font-family: var(--font-eng); font-weight: 700; color: var(--text-grey); font-size: 16px; }
 
-        /* 設定選單 */
+        /* 設定面板 (保持原樣) */
         .config-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
@@ -282,29 +269,39 @@
             background: #222; color: #fff; border: none; border-radius: 12px;
             font-family: var(--font-eng); font-weight: 700; cursor: pointer;
         }
+        
+        @media (max-width: 400px) {
+            .page-title { font-size: 2rem; margin-bottom: 20px; }
+            .filter-bar { margin-bottom: 20px; }
+            .main-word { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Header 容器 (由 JS 載入) -->
     <div id="header-container"></div>
     
-    <div class="info-bar">
-        <div>
-            <div class="filter-status" id="filterTitle">Loading</div>
-            <span class="filter-sub" id="filterSub">...</span>
-        </div>
-        <div class="hud-trigger-inline" onclick="toggleConfig()">
-            <span class="material-icons">tune</span>
-        </div>
-    </div>
-
     <div id="app">
-        <!-- 網格容器 -->
+        <!-- 1. 標題區 -->
+        <h1 class="page-title">7000 Vocabulary</h1>
+
+        <!-- 2. 篩選欄 (類似搜尋列) -->
+        <div class="filter-bar" onclick="toggleConfig()">
+            <div class="filter-content">
+                <span class="material-icons filter-icon">tune</span>
+                <span class="filter-text" id="filterDisplayText">Loading...</span>
+            </div>
+            <span class="material-icons filter-arrow">expand_more</span>
+        </div>
+
+        <!-- 3. 卡片網格 -->
         <div id="grid-wrapper" class="grid-container">
             <!-- JS 渲染內容 -->
         </div>
     </div>
 
+    <!-- 4. 底部導航 (顏色較淡) -->
     <div class="nav-controls">
         <button class="nav-btn" onclick="nextPage(-1)">
             <span class="material-icons">arrow_back</span>
@@ -315,6 +312,7 @@
         </button>
     </div>
 
+    <!-- 設定面板 (隱藏) -->
     <div class="config-overlay" id="configOverlay">
         <div class="config-panel">
             <span class="config-title">Order</span>
@@ -510,7 +508,8 @@
         document.getElementById('btn-seq').classList.toggle('active', sortMode === 'sequential');
         document.getElementById('btn-rnd').classList.toggle('active', sortMode === 'random');
 
-        let title = "", sub = "";
+        let displayText = "";
+        
         if (currentFilter.type === 'level_az') {
             document.querySelectorAll('#levelOptions .opt-btn').forEach(b => {
                 if(b.innerText === (currentFilter.value === 'All' ? 'ALL' : currentFilter.value)) b.classList.add('active');
@@ -518,17 +517,18 @@
             document.querySelectorAll('#azOptions .opt-btn').forEach(b => {
                 if(b.innerText === currentFilter.letter) b.classList.add('active');
             });
-            title = currentFilter.value === 'All' ? 'All Levels' : currentFilter.value;
-            sub = `Starting with "${currentFilter.letter}"`;
+            
+            const lvl = currentFilter.value === 'All' ? 'All Levels' : currentFilter.value;
+            displayText = `${lvl} • ${currentFilter.letter}`;
+            
         } else if (currentFilter.type === 'status') {
             document.querySelector(`.status-filter-btn.${currentFilter.value}`)?.classList.add('active');
             const mapName = { 'green': 'Mastered', 'yellow': 'To Review', 'red': 'Hard Words' };
-            title = mapName[currentFilter.value];
-            sub = "Review Mode";
+            displayText = mapName[currentFilter.value];
         }
 
-        document.getElementById('filterTitle').innerText = title;
-        document.getElementById('filterSub').innerText = sub;
+        // Update the single text element in the filter bar
+        document.getElementById('filterDisplayText').innerText = displayText;
     }
 
     function applyFilters(resetIndex) {
@@ -660,7 +660,7 @@
         return wrapper;
     }
 
-    // --- 核心互動：修復翻面問題 ---
+    // --- 核心互動 ---
     function bindCardInteraction(wrapperElement) {
         const card = wrapperElement.querySelector('.card');
         let startX = 0, startY = 0;
@@ -702,29 +702,22 @@
             card.style.transition = 'transform 0.4s ease'; 
 
             if (getPageSize() === 1 && Math.abs(diffX) > 80 && hasMoved) {
-                // Swipe
                 const dir = diffX > 0 ? -1 : 1; 
                 const flyX = diffX > 0 ? window.innerWidth : -window.innerWidth;
                 const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
                 card.style.transform = `translateX(${flyX}px) rotate(${diffX > 0 ? 20 : -20}deg) ${baseTransform}`;
                 setTimeout(() => nextPage(dir), 200);
             } else {
-                // Reset (Cancel Swipe or Tap)
-                // 1. 先復原位置 (處理拖曳後的回彈)
                 const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
                 card.style.transform = baseTransform;
 
-                // 2. 判斷是否為「點擊」(Tap)
                 if (Math.abs(diffX) < 5 && Math.abs(e.changedTouches[0].clientY - startY) < 5) {
-                    // 重要修正：清空 inline style，否則會覆蓋 CSS class
                     card.style.transform = ''; 
-                    // 執行翻面
                     setTimeout(() => card.classList.toggle('flipped'), 10);
                 }
             }
         });
 
-        // 桌面版 Click 監聽
         if (!('ontouchstart' in window)) {
             wrapperElement.addEventListener('click', (e) => {
                 if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.status-btn')) return;
