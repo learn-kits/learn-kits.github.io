@@ -21,6 +21,10 @@
             --text-dark: #1A1C1E;
             --text-grey: #8E9093;
             
+            --status-green: #34C759;
+            --status-yellow: #FFCC00;
+            --status-red: #FF3B30;
+            
             --card-radius: 24px;
             --bar-radius: 100px;
             
@@ -38,13 +42,12 @@
             font-family: var(--font-main);
             background-color: var(--bg-body);
             margin: 0; padding: 0;
-            /* 鎖定畫面高度，禁止整體捲動 */
             height: 100vh; height: 100dvh;
             overflow: hidden;
             display: flex; flex-direction: column;
         }
 
-        /* --- Header 容器 --- */
+        /* --- Header --- */
         #header-container {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 100;
             height: var(--header-height);
@@ -52,7 +55,7 @@
         }
         #header-container * { pointer-events: auto; }
 
-        /* --- 主佈局容器 --- */
+        /* --- App Layout --- */
         #app {
             width: 100%; height: 100%;
             display: flex; flex-direction: column;
@@ -60,7 +63,6 @@
             box-sizing: border-box;
         }
 
-        /* --- 內容對齊容器 --- */
         .layout-container {
             width: 100%;
             padding: 0 var(--page-padding); 
@@ -72,7 +74,7 @@
             overflow: hidden;
         }
 
-        /* 1. 大標題 */
+        /* 1. Title */
         .page-title {
             font-family: var(--font-eng);
             font-weight: 800;
@@ -80,10 +82,10 @@
             color: var(--text-dark);
             margin: 10px 0 16px 0;
             line-height: 1.1;
-            flex-shrink: 0; /* 防止被擠壓 */
+            flex-shrink: 0; 
         }
 
-        /* 2. 篩選欄位 */
+        /* 2. Filter Bar */
         .filter-bar {
             width: 100%;
             height: 52px;
@@ -96,7 +98,7 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.8);
             cursor: pointer;
-            flex-shrink: 0; /* 防止被擠壓 */
+            flex-shrink: 0; 
             transition: background 0.2s;
         }
         .filter-bar:active { background: rgba(255,255,255,0.9); }
@@ -110,28 +112,25 @@
         }
         .filter-arrow { color: var(--text-grey); font-size: 24px; }
 
-        /* 3. 卡片網格 (修正消失問題) */
+        /* 3. Grid Container */
         .grid-container {
-            flex: 1; /* 自動填滿剩餘高度 */
+            flex: 1; 
             width: 100%;
-            min-height: 0; /* 允許縮小 */
+            min-height: 0; 
             display: grid;
             grid-template-columns: 1fr;
-            
-            /* ★ 關鍵修正：設定列高為 1fr，讓它填滿 Flex 容器 ★ */
-            grid-template-rows: 1fr;
-            
+            grid-template-rows: 1fr; /* Fix for missing cards */
             gap: 16px;
             perspective: 1000px;
             justify-items: center;
-            padding-bottom: 16px; /* 底部留一點縫隙 */
+            padding-bottom: 16px; 
         }
 
         @media (min-width: 600px) {
             .grid-container { grid-template-columns: 1fr 1fr; }
         }
 
-        /* 單張卡片 */
+        /* Card Styles */
         .card-wrapper { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
 
         .card {
@@ -157,8 +156,7 @@
         .front-face { z-index: 2; }
         
         .visual-wrapper {
-            flex: 1.2; /* 圖片區佔比較大 */
-            width: 100%; position: relative;
+            flex: 1.2; width: 100%; position: relative;
             background: #f0f0f0; overflow: hidden;
             isolation: isolate;
         }
@@ -178,8 +176,7 @@
         }
 
         .bottom-content {
-            flex: 1; /* 文字區自動填滿剩餘空間 */
-            width: 100%; padding: 12px 16px; box-sizing: border-box;
+            flex: 1; width: 100%; padding: 12px 16px; box-sizing: border-box;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; background: #fff;
         }
@@ -196,21 +193,28 @@
             font-family: var(--font-eng); color: #999; font-size: 0.9rem;
             display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px;
         }
+        
+        /* --- 卡片上的狀態按鈕 (修正顏色) --- */
         .status-row { display: flex; gap: 16px; justify-content: center; align-items: center; width: 100%; }
+        
         .status-btn {
             width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s; font-size: 22px;
             border: 1px solid #eee; background: #fff;
         }
+        
+        /* 預設顏色 (未選中) */
         .status-btn.green { color: #2E7D32; background: #F1F8E9; border-color: transparent; }   
         .status-btn.yellow { color: #F9A825; background: #FFFDE7; border-color: transparent; }  
         .status-btn.red { color: #C62828; background: #FFEBEE; border-color: transparent; }    
         
-        .status-btn.green.active { background: var(--status-green); color: #fff; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4); }
-        .status-btn.yellow.active { background: var(--status-yellow); color: #fff; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4); }
-        .status-btn.red.active { background: var(--status-red); color: #fff; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); }
+        /* 選中狀態 (填滿顏色 + 白 Icon) - 增加 !important 確保覆蓋 */
+        .status-btn.green.active { background: var(--status-green) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4); }
+        .status-btn.yellow.active { background: var(--status-yellow) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4); }
+        .status-btn.red.active { background: var(--status-red) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); }
 
+        /* Back Face */
         .back-face {
             background: var(--primary); transform: rotateY(180deg);
             padding: 24px; box-sizing: border-box;
@@ -219,11 +223,11 @@
         .trans-text { font-size: 1.5rem; font-weight: 500; color: #FFFFFF; margin-bottom: 16px; }
         .hint-text { font-family: var(--font-eng); font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); letter-spacing: 1px; text-transform: uppercase; }
 
-        /* --- 4. 底部導航列 --- */
+        /* --- Nav Controls --- */
         .nav-bar-container {
             width: 100%;
             flex-shrink: 0;
-            padding: 0 16px 24px 16px; /* 底部留白多一點 */
+            padding: 0 16px 24px 16px;
             box-sizing: border-box;
             display: flex; justify-content: center;
             background: transparent;
@@ -233,7 +237,7 @@
             width: 100%;
             max-width: 800px;
             height: 72px;
-            background: rgba(255, 255, 255, 0.7); /* 淡色背景 */
+            background: rgba(255, 255, 255, 0.7); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border-radius: 24px;
             display: flex; align-items: center; justify-content: space-between;
@@ -257,7 +261,7 @@
             background: rgba(255,255,255,0.5); padding: 6px 16px; border-radius: 12px;
         }
 
-        /* 設定面板 */
+        /* --- Config Panel Styling (修正篩選按鈕顏色) --- */
         .config-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
@@ -278,16 +282,40 @@
             margin: 20px 0 10px 0; display: block;
         }
         .grid-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        
+        /* 一般選項按鈕 (Level, A-Z) */
         .opt-btn {
             padding: 8px 16px; border-radius: 8px; border: 1px solid #eee;
             background: #fff; color: var(--text-dark);
             font-family: var(--font-eng); font-weight: 600; font-size: 14px; cursor: pointer;
         }
-        .opt-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        /* 選中變成藍色 */
+        .opt-btn.active { 
+            background: var(--primary) !important; 
+            color: #fff !important; 
+            border-color: var(--primary) !important; 
+        }
+
+        /* 狀態篩選按鈕 (Mastered/Review/Hard) */
         .status-filter-btn { display: flex; align-items: center; gap: 6px; }
-        .status-filter-btn.green.active { background: var(--status-green); border-color: var(--status-green); }
-        .status-filter-btn.yellow.active { background: var(--status-yellow); border-color: var(--status-yellow); }
-        .status-filter-btn.red.active { background: var(--status-red); border-color: var(--status-red); }
+        
+        /* 選中變成對應顏色 */
+        .status-filter-btn.green.active { 
+            background: var(--status-green) !important; 
+            border-color: var(--status-green) !important; 
+            color: #fff !important;
+        }
+        .status-filter-btn.yellow.active { 
+            background: var(--status-yellow) !important; 
+            border-color: var(--status-yellow) !important; 
+            color: #fff !important;
+        }
+        .status-filter-btn.red.active { 
+            background: var(--status-red) !important; 
+            border-color: var(--status-red) !important; 
+            color: #fff !important;
+        }
+
         .close-config {
             width: 100%; padding: 14px; margin-top: 30px;
             background: #222; color: #fff; border: none; border-radius: 12px;
@@ -348,6 +376,7 @@
             </div>
             <span class="config-title">Review by Status</span>
             <div class="grid-options" id="statusOptions">
+                <!-- 注意：這裡同時有 opt-btn 和 status-filter-btn class -->
                 <button class="opt-btn status-filter-btn green" onclick="filterByStatus('green')">
                     <span class="material-icons" style="font-size:16px;">sentiment_very_satisfied</span> Mastered
                 </button>
