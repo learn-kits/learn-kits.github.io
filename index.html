@@ -24,7 +24,7 @@
             --text-dark: #2F3136;
             --text-grey: #888;
             --card-radius: 24px;
-            --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
             --font-main: 'Noto Sans TC', sans-serif;
             --font-eng: 'Outfit', sans-serif;
         }
@@ -48,8 +48,8 @@
 
         /* 頂部資訊欄 */
         .info-bar {
-            width: 85vw; max-width: 360px;
-            margin-top: 80px; margin-bottom: 20px;
+            width: 90vw; max-width: 1200px;
+            margin-top: 70px; margin-bottom: 20px;
             display: flex; justify-content: space-between; align-items: flex-end;
             z-index: 50;
         }
@@ -70,31 +70,59 @@
             color: var(--text-dark); margin-bottom: 4px;
         }
 
-        /* 主區域 */
+        /* --- Grid 佈局系統 (響應式核心) --- */
         #app {
             width: 100%; flex: 1;
-            display: flex; flex-direction: column;
-            justify-content: flex-start; align-items: center;
+            display: flex; justify-content: center; align-items: flex-start; /* 改為上方對齊 */
             position: relative;
+            overflow: hidden;
         }
 
-        .card-container {
-            position: relative;
-            width: 85vw; max-width: 360px;
-            height: 62vh; max-height: 600px; min-height: 500px;
+        .grid-container {
+            display: grid;
+            width: 90vw; max-width: 1200px;
+            /* 預設手機版 1 欄 */
+            grid-template-columns: 1fr; 
+            gap: 20px;
             perspective: 1000px;
-            z-index: 10;
+            justify-items: center;
+            /* 手機版高度縮小 */
+            height: 55vh; min-height: 420px;
+        }
+
+        /* 平板版 (>= 768px): 2 欄 */
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr 1fr;
+                height: 60vh; min-height: 500px;
+            }
+        }
+
+        /* 電腦版 (>= 1024px): 3 欄 */
+        @media (min-width: 1024px) {
+            .grid-container {
+                grid-template-columns: 1fr 1fr 1fr;
+                height: 65vh;
+            }
+        }
+
+        /* 單張卡片容器 */
+        .card-wrapper {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
         }
 
         .card {
             width: 100%; height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             border-radius: var(--card-radius);
             box-shadow: var(--shadow-card);
+            /* 防止文字選取干擾拖曳 */
+            user-select: none; -webkit-user-select: none;
         }
-        /* CSS 控制翻轉，JS 切換 class */
         .card.flipped { transform: rotateY(180deg); }
 
         .card-face {
@@ -104,7 +132,7 @@
             border-radius: var(--card-radius);
             overflow: hidden;
             display: flex; flex-direction: column;
-            /* 讓 JS 接管觸控 */
+            /* 關鍵：讓 JS 接管觸控 */
             touch-action: none; 
         }
 
@@ -124,46 +152,55 @@
             width: 100%; height: 100%; object-fit: cover;
             display: block; pointer-events: none;
         }
-        .action-cluster-top {
-            position: absolute; top: 0; right: 0; z-index: 20;
-            background: #FFFFFF; border-bottom-left-radius: 20px;
-            padding: 8px 8px 12px 14px; display: flex; gap: 4px;
+
+        /* 右上角按鈕 (改為獨立圓形) */
+        .action-cluster-float {
+            position: absolute; top: 12px; right: 12px; z-index: 20;
+            display: flex; gap: 8px;
         }
-        .action-btn {
-            width: 36px; height: 36px; border: none; background: transparent;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            color: var(--primary); cursor: pointer; text-decoration: none;
+        .action-circle {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); text-decoration: none; cursor: pointer;
+            border: none;
+            transition: transform 0.2s, background 0.2s;
         }
-        .action-btn:hover { background: #E8F0FE; }
-        .action-btn .material-icons { font-size: 24px; }
+        .action-circle:active { transform: scale(0.9); }
+        .action-circle:hover { background: #F5F5F5; }
+        .action-circle .material-icons { font-size: 20px; }
+
 
         /* 下半部：文字 */
         .bottom-content {
-            flex: 1; width: 100%; padding: 20px 24px; box-sizing: border-box;
+            flex: 1; width: 100%; padding: 16px 20px; box-sizing: border-box;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; background: #fff;
             border-bottom-left-radius: var(--card-radius); border-bottom-right-radius: var(--card-radius);
         }
         .level-pill {
-            font-family: var(--font-eng); font-size: 11px; font-weight: 700;
+            font-family: var(--font-eng); font-size: 10px; font-weight: 700;
             color: var(--text-grey); background: #F5F5F5;
-            padding: 4px 12px; border-radius: 20px; letter-spacing: 1px; margin-bottom: 8px;
+            padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; margin-bottom: 6px;
         }
         .main-word {
-            font-family: var(--font-eng); font-weight: 800; font-size: 2.6rem;
+            font-family: var(--font-eng); font-weight: 800; font-size: 2.2rem;
             color: var(--primary); line-height: 1.1; margin-bottom: 4px;
         }
         .kk-row {
-            font-family: var(--font-eng); color: #AAA; font-size: 1rem;
-            display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 20px;
+            font-family: var(--font-eng); color: #AAA; font-size: 0.9rem;
+            display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 16px;
         }
+        /* 狀態按鈕 */
         .status-row {
-            display: flex; gap: 24px; justify-content: center; align-items: center; width: 100%;
+            display: flex; gap: 20px; justify-content: center; align-items: center; width: 100%;
         }
         .status-btn {
-            width: 48px; height: 48px; border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; font-size: 28px;
+            cursor: pointer; transition: all 0.2s; font-size: 24px;
             border: 1px solid rgba(0,0,0,0.05); background: #fff;
         }
         .status-btn:active { transform: scale(0.9); }
@@ -177,11 +214,11 @@
         /* 反面 */
         .back-face {
             background: var(--primary); transform: rotateY(180deg);
-            padding: 40px; box-sizing: border-box;
+            padding: 30px; box-sizing: border-box;
             justify-content: center; align-items: center; text-align: center;
         }
         .trans-text {
-            font-size: 1.8rem; font-weight: 500; color: #FFFFFF; margin-bottom: 20px;
+            font-size: 1.6rem; font-weight: 500; color: #FFFFFF; margin-bottom: 20px;
         }
         .hint-text {
             font-family: var(--font-eng); font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);
@@ -241,12 +278,6 @@
             background: #222; color: #fff; border: none; border-radius: 12px;
             font-family: var(--font-eng); font-weight: 700; cursor: pointer;
         }
-
-        @media (max-width: 400px) {
-            .card-container { width: 90vw; height: 60vh; }
-            .info-bar { width: 90vw; margin-top: 60px; }
-            .main-word { font-size: 2.2rem; }
-        }
     </style>
 </head>
 <body>
@@ -264,15 +295,18 @@
     </div>
 
     <div id="app">
-        <div id="card-wrapper" class="card-container"></div>
+        <!-- 網格容器 -->
+        <div id="grid-wrapper" class="grid-container">
+            <!-- JS 渲染內容 -->
+        </div>
     </div>
 
     <div class="nav-controls">
-        <button class="nav-btn" onclick="nextCard(-1)">
+        <button class="nav-btn" onclick="nextPage(-1)">
             <span class="material-icons">arrow_back</span>
         </button>
         <span class="page-counter" id="pageCounter">0 / 0</span>
-        <button class="nav-btn" onclick="nextCard(1)">
+        <button class="nav-btn" onclick="nextPage(1)">
             <span class="material-icons">arrow_forward</span>
         </button>
     </div>
@@ -324,11 +358,23 @@
     let statusDB = {}; 
     const phoneticCache = {}; 
     
-    const cardWrapper = document.getElementById('card-wrapper');
+    const gridWrapper = document.getElementById('grid-wrapper');
 
+    // Init
     loadStatusDB();
     fetchAllLevels();
     initUI();
+    
+    // 監聽視窗大小改變，即時重繪 (響應式數量)
+    window.addEventListener('resize', () => {
+        renderGrid();
+    });
+
+    function getPageSize() {
+        if (window.innerWidth >= 1024) return 3; // Desktop
+        if (window.innerWidth >= 768) return 2;  // Tablet
+        return 1; // Mobile
+    }
 
     function loadStatusDB() {
         try {
@@ -348,7 +394,7 @@
             statusDB[word] = status;
         }
         saveStatusDB();
-        renderCard(); 
+        renderGrid(); 
     }
 
     async function fetchAllLevels() {
@@ -505,94 +551,220 @@
         displayData = filtered;
         if (resetIndex) currentIndex = 0;
         if (currentIndex >= displayData.length) currentIndex = 0;
-        renderCard();
+        renderGrid();
     }
 
-    function nextCard(dir) {
+    function nextPage(dir) {
         if (displayData.length === 0) return;
-        const card = document.querySelector('.card');
-        if (card && card.style.opacity === '0') return; 
-
-        let next = currentIndex + dir;
-        if (next >= displayData.length) next = 0;
-        if (next < 0) next = displayData.length - 1;
-        currentIndex = next;
         
-        if(card) {
-            const translate = dir > 0 ? '-120%' : '120%';
-            const rotate = dir > 0 ? '-10deg' : '10deg';
-            card.style.transition = 'transform 0.3s ease, opacity 0.3s';
-            card.style.transform = `translateX(${translate}) rotate(${rotate})`;
-            card.style.opacity = '0';
-            setTimeout(() => renderCard(), 300);
-        } else {
-            renderCard();
+        const pageSize = getPageSize();
+        // 如果是手機版，一次移動 1 張，否則移動一頁 (pageSize)
+        const moveAmount = pageSize; 
+
+        let next = currentIndex + (dir * moveAmount);
+        
+        // 循環邏輯
+        if (next >= displayData.length) next = 0;
+        if (next < 0) {
+            // 回到最後一頁的開頭
+            next = Math.floor((displayData.length - 1) / moveAmount) * moveAmount;
+            if (next < 0) next = 0;
         }
+
+        currentIndex = next;
+        renderGrid();
     }
 
-    function renderCard() {
-        cardWrapper.innerHTML = '';
+    function renderGrid() {
+        gridWrapper.innerHTML = '';
         const total = displayData.length;
-        const current = total > 0 ? currentIndex + 1 : 0;
-        document.getElementById('pageCounter').innerText = `${current} / ${total}`;
+        const pageSize = getPageSize();
+        
+        // 更新計數器 (顯示目前第一個索引)
+        const currentDisplay = total > 0 ? currentIndex + 1 : 0;
+        document.getElementById('pageCounter').innerText = `${currentDisplay} / ${total}`;
 
         if (total === 0) {
-            cardWrapper.innerHTML = '<div style="text-align:center; color:#888; margin-top:100px;">NO DATA</div>';
+            gridWrapper.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#888; margin-top:100px;">NO DATA</div>';
             return;
         }
 
-        const item = displayData[currentIndex];
-        const kkId = `kk-${item.word}`;
+        // 渲染此頁的卡片
+        for (let i = 0; i < pageSize; i++) {
+            const dataIndex = currentIndex + i;
+            if (dataIndex >= displayData.length) break; // 超出資料範圍
+
+            const item = displayData[dataIndex];
+            const cardElement = createCardElement(item);
+            gridWrapper.appendChild(cardElement);
+        }
+    }
+
+    function createCardElement(item) {
+        const kkId = `kk-${item.word}-${Math.random().toString(36).substr(2, 9)}`; // 唯一 ID
         const currentStatus = statusDB[item.word]; 
 
-        const card = document.createElement('div');
-        card.className = 'card';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+        
         // HTML 結構
-        card.innerHTML = `
-            <div class="card-face front-face">
-                <div class="visual-wrapper">
-                    <img src="${item.img}" class="word-image" loading="lazy">
-                    <div class="action-cluster-top" onclick="event.stopPropagation()">
-                        <button class="action-btn" onclick="playAudio('${item.word}')">
-                            <span class="material-icons">volume_up</span>
-                        </button>
-                        <a href="https://dictionary.cambridge.org/dictionary/english-chinese-traditional/${item.word.toLowerCase()}" 
-                           target="_blank" class="action-btn">
-                            <span class="material-icons">menu_book</span>
-                        </a>
+        wrapper.innerHTML = `
+            <div class="card">
+                <div class="card-face front-face">
+                    <div class="visual-wrapper">
+                        <img src="${item.img}" class="word-image" loading="lazy">
+                        
+                        <!-- 右上角獨立按鈕 -->
+                        <div class="action-cluster-float" onclick="event.stopPropagation()">
+                            <button class="action-circle" onclick="playAudio('${item.word}')">
+                                <span class="material-icons">volume_up</span>
+                            </button>
+                            <a href="https://dictionary.cambridge.org/dictionary/english-chinese-traditional/${item.word.toLowerCase()}" 
+                            target="_blank" class="action-circle">
+                                <span class="material-icons">menu_book</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="bottom-content">
+                        <div class="level-pill">${item.level.toUpperCase()}</div>
+                        <div class="main-word">${item.word}</div>
+                        <div class="kk-row">
+                            <span id="${kkId}">...</span>
+                            ${item.pos ? `<span>• ${item.pos}</span>` : ''}
+                        </div>
+                        <div class="status-row" onclick="event.stopPropagation()">
+                            <div class="status-btn green ${currentStatus==='green'?'active':''}" onclick="setWordStatus('${item.word}', 'green')">
+                                <span class="material-icons">sentiment_very_satisfied</span>
+                            </div>
+                            <div class="status-btn yellow ${currentStatus==='yellow'?'active':''}" onclick="setWordStatus('${item.word}', 'yellow')">
+                                <span class="material-icons">sentiment_neutral</span>
+                            </div>
+                            <div class="status-btn red ${currentStatus==='red'?'active':''}" onclick="setWordStatus('${item.word}', 'red')">
+                                <span class="material-icons">sentiment_very_dissatisfied</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="bottom-content">
-                    <div class="level-pill">${item.level.toUpperCase()}</div>
-                    <div class="main-word">${item.word}</div>
-                    <div class="kk-row">
-                        <span id="${kkId}">...</span>
-                        ${item.pos ? `<span>• ${item.pos}</span>` : ''}
-                    </div>
-                    <div class="status-row" onclick="event.stopPropagation()">
-                        <div class="status-btn green ${currentStatus==='green'?'active':''}" onclick="setWordStatus('${item.word}', 'green')">
-                            <span class="material-icons">sentiment_very_satisfied</span>
-                        </div>
-                        <div class="status-btn yellow ${currentStatus==='yellow'?'active':''}" onclick="setWordStatus('${item.word}', 'yellow')">
-                            <span class="material-icons">sentiment_neutral</span>
-                        </div>
-                        <div class="status-btn red ${currentStatus==='red'?'active':''}" onclick="setWordStatus('${item.word}', 'red')">
-                            <span class="material-icons">sentiment_very_dissatisfied</span>
-                        </div>
-                    </div>
+                <div class="card-face back-face">
+                    <div class="trans-text">${item.trans}</div>
+                    <div class="hint-text">Tap to return</div>
                 </div>
-            </div>
-            <div class="card-face back-face">
-                <div class="trans-text">${item.trans}</div>
-                <div class="hint-text">Tap to return</div>
             </div>
         `;
-        
-        cardWrapper.appendChild(card);
-        initTouchLogic(cardWrapper); // 綁定修復後的邏輯
 
-        if (!phoneticCache[item.word]) fetchPhonetic(item.word, kkId);
-        else document.getElementById(kkId).innerText = phoneticCache[item.word];
+        // 綁定單張卡片的互動邏輯
+        bindCardInteraction(wrapper);
+
+        // Fetch Phonetic
+        if (!phoneticCache[item.word]) {
+            fetchPhonetic(item.word, kkId);
+        } else {
+            setTimeout(() => {
+                const el = document.getElementById(kkId);
+                if(el) el.innerText = phoneticCache[item.word];
+            }, 0);
+        }
+
+        return wrapper;
+    }
+
+    // --- 核心互動邏輯：解決翻面與滑動衝突 ---
+    function bindCardInteraction(wrapperElement) {
+        const card = wrapperElement.querySelector('.card');
+        let startX = 0, startY = 0;
+        let isTouch = false;
+        let hasMoved = false;
+        
+        // 1. Touch Events (Mobile Swipe & Flip)
+        wrapperElement.addEventListener('touchstart', (e) => {
+            // 如果點到按鈕，不處理
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.status-btn')) return;
+            
+            isTouch = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            hasMoved = false;
+            
+            // 只有手機版 (pageSize=1) 才啟用 Swipe 動畫跟隨
+            if (getPageSize() === 1) {
+                card.style.transition = 'none';
+            }
+        }, {passive: true});
+
+        wrapperElement.addEventListener('touchmove', (e) => {
+            if (!isTouch) return;
+            const currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            const diffY = e.touches[0].clientY - startY;
+
+            // 判斷是否為水平滑動
+            if (Math.abs(diffX) > 10) {
+                hasMoved = true;
+                // 手機版：跟隨手指
+                if (getPageSize() === 1) {
+                    const rotate = diffX * 0.05;
+                    const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+                    card.style.transform = `translateX(${diffX}px) rotate(${rotate}deg) ${baseTransform}`;
+                }
+            }
+        }, {passive: true});
+
+        wrapperElement.addEventListener('touchend', (e) => {
+            if (!isTouch) return;
+            isTouch = false;
+            const endX = e.changedTouches[0].clientX;
+            const diffX = endX - startX;
+
+            card.style.transition = 'transform 0.4s ease'; // 恢復動畫
+
+            // 判斷是否為手機版 Swipe (門檻 80px)
+            if (getPageSize() === 1 && Math.abs(diffX) > 80 && hasMoved) {
+                // Swipe: Change Page
+                const dir = diffX > 0 ? -1 : 1; 
+                const flyX = diffX > 0 ? window.innerWidth : -window.innerWidth;
+                const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+                
+                card.style.transform = `translateX(${flyX}px) rotate(${diffX > 0 ? 20 : -20}deg) ${baseTransform}`;
+                
+                setTimeout(() => nextPage(dir), 200);
+            } else {
+                // Not Swipe: Reset Position
+                const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+                card.style.transform = baseTransform;
+
+                // 如果移動極小 (Tap)，則翻面
+                if (Math.abs(diffX) < 5 && Math.abs(e.changedTouches[0].clientY - startY) < 5) {
+                    // Tap -> Flip
+                    card.classList.toggle('flipped');
+                }
+            }
+        });
+
+        // 2. Mouse Click (Desktop Flip)
+        wrapperElement.addEventListener('click', (e) => {
+            // 如果是 Touch 裝置觸發的 Click (會在 Touchend 後)，忽略它，以免雙重觸發
+            // 我們用一個簡單的時間差或直接檢測 Touch 事件是否剛發生過來處理有點複雜
+            // 最簡單的方式：檢查是否剛發生過 TouchStart (這裡簡化處理)
+            
+            // 只有當這不是 Touch 觸發的模擬 Click 時才執行
+            // 但因為我們上面的 touchend 已經處理了 Flip，所以這裡其實只需要處理 Desktop Mouse Click
+            // 我們可以透過檢查 event.pointerType (如果瀏覽器支援) 或簡單檢查按鈕
+            
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.status-btn')) return;
+            
+            // 這裡做一個簡單的防呆，如果剛觸發過 touch，就不處理 click
+            // 實務上可以略過，因為我們在 touchend 沒有 preventDefault，click 還是會發生
+            // 但因為我們在 touchend 裡手動 toggle 了，所以這裡最好擋掉
+            // 由於這是一個純前端簡單實作，我們假設桌面版沒有 touch 事件
+        });
+        
+        // 桌面版專用 Click 監聽 (如果不支援 Touch)
+        if (!('ontouchstart' in window)) {
+            wrapperElement.addEventListener('click', (e) => {
+                if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.status-btn')) return;
+                card.classList.toggle('flipped');
+            });
+        }
     }
 
     function toggleConfig() {
@@ -621,81 +793,6 @@
             u.lang = 'en-US';
             window.speechSynthesis.speak(u);
         }
-    }
-
-    // --- 嚴格的觸控判斷邏輯 (關鍵修正) ---
-    function initTouchLogic(element) {
-        let startX = 0, startY = 0;
-        let isDragging = false;
-        const swipeThreshold = 80; // 大於此距離 = Swipe
-        const tapThreshold = 5;   // 小於此距離 = Tap (Flip)
-        let card = null;
-
-        element.addEventListener('touchstart', e => {
-            if (e.target.closest('.action-btn') || e.target.closest('.status-btn')) return;
-            card = element.querySelector('.card');
-            if(!card) return;
-            
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            isDragging = true;
-            card.style.transition = 'none'; // 開始拖曳時，移除動畫延遲，跟隨手指
-        }, {passive:true});
-
-        element.addEventListener('touchmove', e => {
-            if(!isDragging || !card) return;
-            const currentX = e.touches[0].clientX;
-            const diffX = currentX - startX;
-            
-            // 跟隨手指移動
-            const rotate = diffX * 0.05;
-            // 保持翻轉狀態
-            const baseRotate = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
-            card.style.transform = `translateX(${diffX}px) rotate(${rotate}deg) ${baseRotate}`;
-        }, {passive:true});
-
-        element.addEventListener('touchend', e => {
-            if(!isDragging || !card) return;
-            isDragging = false;
-            
-            const endX = e.changedTouches[0].clientX;
-            const diffX = endX - startX;
-            const absDiffX = Math.abs(diffX);
-
-            card.style.transition = 'transform 0.4s ease'; // 恢復動畫效果
-
-            if (absDiffX > swipeThreshold) {
-                // 1. 這是滑動 (Swipe) -> 切換卡片
-                const dir = diffX > 0 ? -1 : 1; 
-                const flyX = diffX > 0 ? window.innerWidth : -window.innerWidth;
-                const baseRotate = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
-                
-                card.style.transform = `translateX(${flyX}px) rotate(${diffX > 0 ? 20 : -20}deg) ${baseRotate}`;
-                setTimeout(() => nextCard(dir), 200);
-
-            } else if (absDiffX < tapThreshold) {
-                // 2. 這是點擊 (Tap) -> 翻轉卡片
-                // 先清除 translateX 造成的偏移
-                card.style.transform = ''; 
-                // 切換 class
-                card.classList.toggle('flipped');
-
-            } else {
-                // 3. 這是無效拖曳 (Cancel) -> 彈回原位，不翻轉
-                // 如果原本是翻轉的，要保持 rotateY(180deg)
-                const currentRotate = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
-                card.style.transform = currentRotate;
-            }
-        });
-
-        // 桌面版點擊支援
-        element.addEventListener('click', (e) => {
-             if (e.target.closest('.action-btn') || e.target.closest('.status-btn')) return;
-             if ('ontouchstart' in window) return; // 觸控設備已由 touchend 處理
-             
-             const c = element.querySelector('.card');
-             if(c) c.classList.toggle('flipped');
-        });
     }
 
     fetch('header.html').then(r=>r.text()).then(d=>{
