@@ -906,9 +906,49 @@
         }
     }
 
-    fetch('header.html').then(r=>r.text()).then(d=>{
+// ★★★ 關鍵修改：Header 載入與手機選單邏輯 ★★★
+
+    // 1. 載入 Header
+    fetch('header.html').then(r => r.text()).then(d => {
         document.getElementById('header-container').innerHTML = d;
+        // 確保載入後，若需要額外綁定可在這裡執行
     });
+
+    // 2. 將 toggleMobileMenu 定義在全域 (Global)，這樣 HTML 中的 onclick 才能找到它
+    window.toggleMobileMenu = function() {
+        const menu = document.getElementById('mobileNav');
+        const backdrop = document.getElementById('menuBackdrop');
+        const btn = document.querySelector('.mobile-menu-btn');
+        const btnIcon = btn ? btn.querySelector('.material-icons') : null;
+        
+        if (!menu || !backdrop || !btnIcon) return; // 防呆
+
+        if (menu.classList.contains('open')) {
+            // 關閉
+            menu.classList.remove('open');
+            backdrop.classList.remove('open');
+            
+            // 恢復按鈕
+            btnIcon.innerText = 'grid_view';
+            btn.classList.remove('white');
+        } else {
+            // 開啟
+            menu.classList.add('open');
+            backdrop.classList.add('open');
+            
+            // 按鈕變關閉且變白
+            btnIcon.innerText = 'close';
+            btn.classList.add('white');
+        }
+    };
+
+    // --- 初始化執行 ---
+    loadStatusDB(); 
+    loadAppState(); 
+    initUI();       
+    fetchAllLevels(); 
+    
+    window.addEventListener('resize', () => { renderGrid(); });
 
 </script>
 </body>
