@@ -47,15 +47,13 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- Header 容器 (關鍵修正) --- */
+        /* --- Header 容器 --- */
         #header-container {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 100;
             height: var(--header-height);
-            /* 讓容器本身不擋點擊，讓內部的 header.html 決定哪些元素可點 */
+            /* 讓 Header 容器不擋點擊，內部元素由 header.html 控制 */
             pointer-events: none; 
         }
-        /* ★★★ 刪除了 #header-container * { pointer-events: auto; } 這行 ★★★ */
-        /* 這讓 header.html 裡的 pointer-events: none 設定能正常生效 */
 
         /* --- App Layout --- */
         #app {
@@ -205,15 +203,17 @@
             border: 1px solid #eee; background: #fff;
         }
         
+        /* 狀態顏色 */
         .status-btn.green { color: #2E7D32; background: #F1F8E9; border-color: transparent; }   
         .status-btn.yellow { color: #F9A825; background: #FFFDE7; border-color: transparent; }  
         .status-btn.red { color: #C62828; background: #FFEBEE; border-color: transparent; }    
         
+        /* 選中狀態 (強制生效) */
         .status-btn.green.active { background: var(--status-green) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4); }
         .status-btn.yellow.active { background: var(--status-yellow) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4); }
         .status-btn.red.active { background: var(--status-red) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); }
 
-        /* --- 狀態回饋遮罩動畫 --- */
+        /* --- 狀態回饋遮罩動畫 (完美置中) --- */
         .feedback-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(4px);
@@ -426,13 +426,42 @@
     
     const gridWrapper = document.getElementById('grid-wrapper');
 
-    // Init Sequence
+    // --- Init Sequence ---
     loadStatusDB(); 
     loadAppState(); 
     initUI();       
     fetchAllLevels(); 
     
     window.addEventListener('resize', () => { renderGrid(); });
+
+    // Fetch Header
+    fetch('header.html').then(r => r.text()).then(d => {
+        document.getElementById('header-container').innerHTML = d;
+    });
+
+    // Mobile Menu Toggle Logic
+    window.toggleMobileMenu = function() {
+        const menu = document.getElementById('mobileNav');
+        const backdrop = document.getElementById('menuBackdrop');
+        const btn = document.querySelector('.mobile-menu-btn');
+        const btnIcon = btn ? btn.querySelector('.material-icons') : null;
+        
+        if (!menu || !backdrop || !btnIcon) return; 
+
+        if (menu.classList.contains('open')) {
+            menu.classList.remove('open');
+            backdrop.classList.remove('open');
+            btnIcon.innerText = 'grid_view';
+            btn.classList.remove('white');
+        } else {
+            menu.classList.add('open');
+            backdrop.classList.add('open');
+            btnIcon.innerText = 'close';
+            btn.classList.add('white');
+        }
+    };
+
+    // --- Functions ---
 
     function getPageSize() {
         if (window.innerWidth >= 600) return 2; 
@@ -484,6 +513,7 @@
 
         const allData = await Promise.all(promises);
         fullVocabData = mergeAndDeduplicate(allData.flat());
+        
         applyFilters(false);
         
         if (savedIndex > 0 && savedIndex < displayData.length) {
@@ -532,6 +562,7 @@
 
     function initUI() {
         const lvlContainer = document.getElementById('levelOptions');
+        lvlContainer.innerHTML = '';
         const levels = ['All', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6'];
         levels.forEach(l => {
             const btn = document.createElement('button');
@@ -546,6 +577,7 @@
         });
 
         const azContainer = document.getElementById('azOptions');
+        azContainer.innerHTML = '';
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
@@ -905,50 +937,6 @@
             window.speechSynthesis.speak(u);
         }
     }
-
-// ★★★ 關鍵修改：Header 載入與手機選單邏輯 ★★★
-
-    // 1. 載入 Header
-    fetch('header.html').then(r => r.text()).then(d => {
-        document.getElementById('header-container').innerHTML = d;
-        // 確保載入後，若需要額外綁定可在這裡執行
-    });
-
-    // 2. 將 toggleMobileMenu 定義在全域 (Global)，這樣 HTML 中的 onclick 才能找到它
-    window.toggleMobileMenu = function() {
-        const menu = document.getElementById('mobileNav');
-        const backdrop = document.getElementById('menuBackdrop');
-        const btn = document.querySelector('.mobile-menu-btn');
-        const btnIcon = btn ? btn.querySelector('.material-icons') : null;
-        
-        if (!menu || !backdrop || !btnIcon) return; // 防呆
-
-        if (menu.classList.contains('open')) {
-            // 關閉
-            menu.classList.remove('open');
-            backdrop.classList.remove('open');
-            
-            // 恢復按鈕
-            btnIcon.innerText = 'grid_view';
-            btn.classList.remove('white');
-        } else {
-            // 開啟
-            menu.classList.add('open');
-            backdrop.classList.add('open');
-            
-            // 按鈕變關閉且變白
-            btnIcon.innerText = 'close';
-            btn.classList.add('white');
-        }
-    };
-
-    // --- 初始化執行 ---
-    loadStatusDB(); 
-    loadAppState(); 
-    initUI();       
-    fetchAllLevels(); 
-    
-    window.addEventListener('resize', () => { renderGrid(); });
 
 </script>
 </body>
