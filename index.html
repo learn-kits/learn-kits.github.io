@@ -74,7 +74,7 @@
             overflow: hidden;
         }
 
-        /* Title */
+        /* 1. Title */
         .page-title {
             font-family: var(--font-eng);
             font-weight: 800;
@@ -85,7 +85,7 @@
             flex-shrink: 0; 
         }
 
-        /* Filter Bar */
+        /* 2. Filter Bar */
         .filter-bar {
             width: 100%;
             height: 52px;
@@ -112,14 +112,14 @@
         }
         .filter-arrow { color: var(--text-grey); font-size: 24px; }
 
-        /* Grid Container */
+        /* 3. Grid Container */
         .grid-container {
             flex: 1; 
             width: 100%;
             min-height: 0; 
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: 1fr; 
+            grid-template-rows: 1fr; /* Fix for missing cards */
             gap: 16px;
             perspective: 1000px;
             justify-items: center;
@@ -194,6 +194,7 @@
             display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px;
         }
         
+        /* --- 卡片上的狀態按鈕 --- */
         .status-row { display: flex; gap: 16px; justify-content: center; align-items: center; width: 100%; }
         
         .status-btn {
@@ -203,16 +204,46 @@
             border: 1px solid #eee; background: #fff;
         }
         
-        /* 狀態顏色 */
+        /* 預設顏色 (未選中) */
         .status-btn.green { color: #2E7D32; background: #F1F8E9; border-color: transparent; }   
         .status-btn.yellow { color: #F9A825; background: #FFFDE7; border-color: transparent; }  
         .status-btn.red { color: #C62828; background: #FFEBEE; border-color: transparent; }    
         
-        /* 強制選中顏色 */
+        /* 選中狀態 (強制生效) */
         .status-btn.green.active { background: var(--status-green) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4); }
         .status-btn.yellow.active { background: var(--status-yellow) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4); }
         .status-btn.red.active { background: var(--status-red) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); }
 
+        /* --- 狀態回饋遮罩動畫 --- */
+        .feedback-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: var(--card-radius);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .feedback-overlay.show { opacity: 1; }
+        
+        .feedback-icon {
+            font-size: 80px; margin-bottom: 10px; transform: scale(0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .feedback-overlay.show .feedback-icon { transform: scale(1); }
+        
+        .feedback-text {
+            font-family: var(--font-eng); font-weight: 800; font-size: 1.5rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            opacity: 0; transform: translateY(10px); transition: all 0.3s ease 0.1s;
+        }
+        .feedback-overlay.show .feedback-text { opacity: 1; transform: translateY(0); }
+        
+        /* 回饋內容顏色 */
+        .feedback-content.green { color: var(--status-green); }
+        .feedback-content.yellow { color: var(--status-yellow); }
+        .feedback-content.red { color: var(--status-red); }
+
+        /* Back Face */
         .back-face {
             background: var(--primary); transform: rotateY(180deg);
             padding: 24px; box-sizing: border-box;
@@ -223,32 +254,24 @@
 
         /* --- Nav Controls --- */
         .nav-bar-container {
-            width: 100%;
-            flex-shrink: 0;
-            padding: 0 16px 24px 16px;
-            box-sizing: border-box;
-            display: flex; justify-content: center;
-            background: transparent;
+            width: 100%; flex-shrink: 0;
+            padding: 0 16px 24px 16px; box-sizing: border-box;
+            display: flex; justify-content: center; background: transparent;
         }
 
         .nav-controls {
-            width: 100%;
-            max-width: 800px;
-            height: 72px;
+            width: 100%; max-width: 800px; height: 72px;
             background: rgba(255, 255, 255, 0.7); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border-radius: 24px;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px;
-            box-sizing: border-box;
-            box-shadow: var(--shadow-nav);
-            border: 1px solid rgba(255,255,255,0.5);
+            padding: 0 12px; box-sizing: border-box;
+            box-shadow: var(--shadow-nav); border: 1px solid rgba(255,255,255,0.5);
         }
 
         .nav-btn {
             width: 56px; height: 56px; border-radius: 20px; border: none;
-            background: transparent;
-            color: var(--text-dark);
+            background: transparent; color: var(--text-dark);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: background 0.2s;
         }
@@ -294,7 +317,7 @@
 
         .status-filter-btn { display: flex; align-items: center; gap: 6px; }
         
-        /* 狀態篩選按鈕樣式 */
+        /* 設定面板按鈕顏色 */
         .status-filter-btn.green.active { background: var(--status-green) !important; border-color: var(--status-green) !important; color: #fff !important; }
         .status-filter-btn.yellow.active { background: var(--status-yellow) !important; border-color: var(--status-yellow) !important; color: #fff !important; }
         .status-filter-btn.red.active { background: var(--status-red) !important; border-color: var(--status-red) !important; color: #fff !important; }
@@ -327,7 +350,7 @@
             </div>
 
             <div id="grid-wrapper" class="grid-container">
-                <!-- JS 渲染 -->
+                <!-- JS Rendered -->
             </div>
         </div>
 
@@ -354,7 +377,6 @@
             
             <span class="config-title">Status</span>
             <div class="grid-options" id="statusOptions">
-                <!-- 狀態選項更新 -->
                 <button class="opt-btn" id="st-all" onclick="setStatusFilter('all')">All</button>
                 <button class="opt-btn" id="st-none" onclick="setStatusFilter('none')">None</button>
                 
@@ -394,7 +416,7 @@
 
     let fullVocabData = [], displayData = [];
     
-    // 核心資料結構更新：包含 level, letter, status 三個維度
+    // Filter State: Combined Logic
     let filterState = {
         level: 'All',
         letter: 'A',
@@ -431,16 +453,6 @@
 
     function saveStatusDB() {
         localStorage.setItem(STATUS_KEY, JSON.stringify(statusDB));
-    }
-
-    function setWordStatus(word, status) {
-        if (statusDB[word] === status) {
-            delete statusDB[word];
-        } else {
-            statusDB[word] = status;
-        }
-        saveStatusDB();
-        renderGrid(); 
     }
 
     async function fetchAllLevels() {
@@ -507,7 +519,7 @@
             btn.className = 'opt-btn';
             btn.innerText = l === 'All' ? 'ALL' : l;
             btn.onclick = () => {
-                filterState.level = l; // Update state
+                filterState.level = l; 
                 updateFilterUI();
                 applyFilters(true);
             };
@@ -520,7 +532,7 @@
             btn.className = 'opt-btn';
             btn.innerText = l;
             btn.onclick = () => {
-                filterState.letter = l; // Update state
+                filterState.letter = l; 
                 updateFilterUI();
                 applyFilters(true);
             };
@@ -543,44 +555,33 @@
     }
 
     function updateFilterUI() {
-        // Reset all buttons
         document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
         
-        // 1. Sort
         document.getElementById('btn-seq').classList.toggle('active', sortMode === 'sequential');
         document.getElementById('btn-rnd').classList.toggle('active', sortMode === 'random');
 
-        // 2. Level
         document.querySelectorAll('#levelOptions .opt-btn').forEach(b => {
             const btnText = b.innerText === 'ALL' ? 'All' : b.innerText;
             if(btnText === filterState.level) b.classList.add('active');
         });
 
-        // 3. Letter
         document.querySelectorAll('#azOptions .opt-btn').forEach(b => {
             if(b.innerText === filterState.letter) b.classList.add('active');
         });
 
-        // 4. Status
-        // Remove active from all status buttons
         ['st-all', 'st-none', 'st-green', 'st-yellow', 'st-red'].forEach(id => {
             document.getElementById(id).classList.remove('active');
         });
-        // Add active to current
         if(filterState.status === 'all') document.getElementById('st-all').classList.add('active');
         else if(filterState.status === 'none') document.getElementById('st-none').classList.add('active');
         else if(filterState.status === 'green') document.getElementById('st-green').classList.add('active');
         else if(filterState.status === 'yellow') document.getElementById('st-yellow').classList.add('active');
         else if(filterState.status === 'red') document.getElementById('st-red').classList.add('active');
 
-        // 5. Update Display Text Logic
         let displayStr = "";
-        
-        // Base logic: Level + Letter
         const lvlStr = filterState.level === 'All' ? 'All Levels' : filterState.level;
         displayStr = `${lvlStr} • ${filterState.letter}`;
 
-        // Append status info if not 'all'
         const statusMap = {
             'none': 'None',
             'green': 'Mastered',
@@ -598,15 +599,12 @@
     function applyFilters(resetIndex) {
         let filtered = fullVocabData;
 
-        // 1. Filter by Level
         if (filterState.level !== 'All') {
             filtered = filtered.filter(item => item.levels.includes(filterState.level));
         }
 
-        // 2. Filter by Letter
         filtered = filtered.filter(item => item.word.toUpperCase().startsWith(filterState.letter));
 
-        // 3. Filter by Status
         if (filterState.status !== 'all') {
             if (filterState.status === 'none') {
                 filtered = filtered.filter(item => !statusDB[item.word]);
@@ -615,9 +613,7 @@
             }
         }
 
-        // Sort
         if (sortMode === 'random') {
-            // Fisher-Yates Shuffle
             for (let i = filtered.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
@@ -680,10 +676,20 @@
 
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
+        wrapper.setAttribute('data-word', item.word);
         
         wrapper.innerHTML = `
             <div class="card">
                 <div class="card-face front-face">
+                    
+                    <!-- Feedback Overlay -->
+                    <div class="feedback-overlay" id="overlay-${kkId}">
+                        <div class="feedback-content">
+                            <span class="material-icons feedback-icon">check_circle</span>
+                            <div class="feedback-text">Mastered</div>
+                        </div>
+                    </div>
+
                     <div class="visual-wrapper">
                         <img src="${item.img}" class="word-image" loading="lazy">
                         <div class="action-cluster-float" onclick="event.stopPropagation()">
@@ -696,6 +702,7 @@
                             </a>
                         </div>
                     </div>
+                    
                     <div class="bottom-content">
                         <div class="level-pill">${item.level.toUpperCase()}</div>
                         <div class="main-word">${item.word}</div>
@@ -716,6 +723,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card-face back-face">
                     <div class="trans-text">${item.trans}</div>
                     <div class="hint-text">Tap to return</div>
@@ -724,7 +732,7 @@
         `;
 
         bindCardInteraction(wrapper);
-
+        
         if (!phoneticCache[item.word]) {
             fetchPhonetic(item.word, kkId);
         } else {
@@ -735,6 +743,57 @@
         }
 
         return wrapper;
+    }
+
+    function setWordStatus(word, status) {
+        if (statusDB[word] === status) {
+            delete statusDB[word];
+        } else {
+            statusDB[word] = status;
+        }
+        saveStatusDB();
+
+        const activeWrapper = document.querySelector(`.card-wrapper[data-word="${word}"]`);
+        if (activeWrapper) {
+            const btns = activeWrapper.querySelectorAll('.status-btn');
+            btns.forEach(b => b.classList.remove('active')); 
+            
+            if (statusDB[word] === status) {
+                const targetBtn = activeWrapper.querySelector(`.status-btn.${status}`);
+                if(targetBtn) targetBtn.classList.add('active');
+            }
+        }
+
+        const isFilterAll = filterState.status === 'all';
+        const doesMatchFilter = statusDB[word] === filterState.status || (filterState.status === 'none' && !statusDB[word]);
+
+        if (!isFilterAll && !doesMatchFilter) {
+            if (activeWrapper && statusDB[word]) { 
+                const overlay = activeWrapper.querySelector('.feedback-overlay');
+                const content = overlay.querySelector('.feedback-content');
+                const icon = overlay.querySelector('.feedback-icon');
+                const text = overlay.querySelector('.feedback-text');
+
+                content.className = 'feedback-content ' + status; 
+                
+                if (status === 'green') {
+                    icon.innerText = 'check_circle';
+                    text.innerText = 'Mastered';
+                } else if (status === 'yellow') {
+                    icon.innerText = 'error'; 
+                    text.innerText = 'Normal';
+                } else if (status === 'red') {
+                    icon.innerText = 'warning';
+                    text.innerText = 'Hard';
+                }
+
+                overlay.classList.add('show');
+            }
+
+            setTimeout(() => {
+                applyFilters(false); 
+            }, 600); 
+        }
     }
 
     function bindCardInteraction(wrapperElement) {
