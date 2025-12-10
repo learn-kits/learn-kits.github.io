@@ -74,7 +74,7 @@
             overflow: hidden;
         }
 
-        /* 1. Title */
+        /* Title */
         .page-title {
             font-family: var(--font-eng);
             font-weight: 800;
@@ -85,7 +85,7 @@
             flex-shrink: 0; 
         }
 
-        /* 2. Filter Bar */
+        /* Filter Bar */
         .filter-bar {
             width: 100%;
             height: 52px;
@@ -112,14 +112,14 @@
         }
         .filter-arrow { color: var(--text-grey); font-size: 24px; }
 
-        /* 3. Grid Container */
+        /* Grid Container */
         .grid-container {
             flex: 1; 
             width: 100%;
             min-height: 0; 
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: 1fr; /* Fix for missing cards */
+            grid-template-rows: 1fr; 
             gap: 16px;
             perspective: 1000px;
             justify-items: center;
@@ -194,7 +194,6 @@
             display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px;
         }
         
-        /* --- 卡片上的狀態按鈕 (修正顏色) --- */
         .status-row { display: flex; gap: 16px; justify-content: center; align-items: center; width: 100%; }
         
         .status-btn {
@@ -204,17 +203,16 @@
             border: 1px solid #eee; background: #fff;
         }
         
-        /* 預設顏色 (未選中) */
+        /* 狀態顏色 */
         .status-btn.green { color: #2E7D32; background: #F1F8E9; border-color: transparent; }   
         .status-btn.yellow { color: #F9A825; background: #FFFDE7; border-color: transparent; }  
         .status-btn.red { color: #C62828; background: #FFEBEE; border-color: transparent; }    
         
-        /* 選中狀態 (填滿顏色 + 白 Icon) - 增加 !important 確保覆蓋 */
+        /* 強制選中顏色 */
         .status-btn.green.active { background: var(--status-green) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4); }
         .status-btn.yellow.active { background: var(--status-yellow) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4); }
         .status-btn.red.active { background: var(--status-red) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); }
 
-        /* Back Face */
         .back-face {
             background: var(--primary); transform: rotateY(180deg);
             padding: 24px; box-sizing: border-box;
@@ -261,7 +259,7 @@
             background: rgba(255,255,255,0.5); padding: 6px 16px; border-radius: 12px;
         }
 
-        /* --- Config Panel Styling (修正篩選按鈕顏色) --- */
+        /* --- Config Panel --- */
         .config-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
@@ -283,38 +281,23 @@
         }
         .grid-options { display: flex; flex-wrap: wrap; gap: 8px; }
         
-        /* 一般選項按鈕 (Level, A-Z) */
         .opt-btn {
             padding: 8px 16px; border-radius: 8px; border: 1px solid #eee;
             background: #fff; color: var(--text-dark);
             font-family: var(--font-eng); font-weight: 600; font-size: 14px; cursor: pointer;
         }
-        /* 選中變成藍色 */
         .opt-btn.active { 
             background: var(--primary) !important; 
             color: #fff !important; 
             border-color: var(--primary) !important; 
         }
 
-        /* 狀態篩選按鈕 (Mastered/Review/Hard) */
         .status-filter-btn { display: flex; align-items: center; gap: 6px; }
         
-        /* 選中變成對應顏色 */
-        .status-filter-btn.green.active { 
-            background: var(--status-green) !important; 
-            border-color: var(--status-green) !important; 
-            color: #fff !important;
-        }
-        .status-filter-btn.yellow.active { 
-            background: var(--status-yellow) !important; 
-            border-color: var(--status-yellow) !important; 
-            color: #fff !important;
-        }
-        .status-filter-btn.red.active { 
-            background: var(--status-red) !important; 
-            border-color: var(--status-red) !important; 
-            color: #fff !important;
-        }
+        /* 狀態篩選按鈕樣式 */
+        .status-filter-btn.green.active { background: var(--status-green) !important; border-color: var(--status-green) !important; color: #fff !important; }
+        .status-filter-btn.yellow.active { background: var(--status-yellow) !important; border-color: var(--status-yellow) !important; color: #fff !important; }
+        .status-filter-btn.red.active { background: var(--status-red) !important; border-color: var(--status-red) !important; color: #fff !important; }
 
         .close-config {
             width: 100%; padding: 14px; margin-top: 30px;
@@ -329,15 +312,12 @@
 </head>
 <body>
 
-    <!-- Header 容器 -->
     <div id="header-container"></div>
     
     <div id="app">
         <div class="layout-container">
-            <!-- 1. 標題 -->
             <h1 class="page-title">7000 Vocabulary</h1>
 
-            <!-- 2. 篩選欄 -->
             <div class="filter-bar" onclick="toggleConfig()">
                 <div class="filter-content">
                     <span class="material-icons filter-icon">tune</span>
@@ -346,13 +326,11 @@
                 <span class="material-icons filter-arrow">expand_more</span>
             </div>
 
-            <!-- 3. 卡片網格 -->
             <div id="grid-wrapper" class="grid-container">
-                <!-- JS 渲染內容 -->
+                <!-- JS 渲染 -->
             </div>
         </div>
 
-        <!-- 4. 底部導航 -->
         <div class="nav-bar-container">
             <div class="nav-controls">
                 <button class="nav-btn" onclick="nextPage(-1)">
@@ -366,7 +344,6 @@
         </div>
     </div>
 
-    <!-- 設定面板 (隱藏) -->
     <div class="config-overlay" id="configOverlay">
         <div class="config-panel">
             <span class="config-title">Order</span>
@@ -374,23 +351,30 @@
                 <button class="opt-btn active" id="btn-seq" onclick="setSortMode('sequential')">A-Z</button>
                 <button class="opt-btn" id="btn-rnd" onclick="setSortMode('random')">Shuffle</button>
             </div>
-            <span class="config-title">Review by Status</span>
+            
+            <span class="config-title">Status</span>
             <div class="grid-options" id="statusOptions">
-                <!-- 注意：這裡同時有 opt-btn 和 status-filter-btn class -->
-                <button class="opt-btn status-filter-btn green" onclick="filterByStatus('green')">
+                <!-- 狀態選項更新 -->
+                <button class="opt-btn" id="st-all" onclick="setStatusFilter('all')">All</button>
+                <button class="opt-btn" id="st-none" onclick="setStatusFilter('none')">None</button>
+                
+                <button class="opt-btn status-filter-btn green" id="st-green" onclick="setStatusFilter('green')">
                     <span class="material-icons" style="font-size:16px;">sentiment_very_satisfied</span> Mastered
                 </button>
-                <button class="opt-btn status-filter-btn yellow" onclick="filterByStatus('yellow')">
-                    <span class="material-icons" style="font-size:16px;">sentiment_neutral</span> Review
+                <button class="opt-btn status-filter-btn yellow" id="st-yellow" onclick="setStatusFilter('yellow')">
+                    <span class="material-icons" style="font-size:16px;">sentiment_neutral</span> Normal
                 </button>
-                <button class="opt-btn status-filter-btn red" onclick="filterByStatus('red')">
+                <button class="opt-btn status-filter-btn red" id="st-red" onclick="setStatusFilter('red')">
                     <span class="material-icons" style="font-size:16px;">sentiment_very_dissatisfied</span> Hard
                 </button>
             </div>
+            
             <span class="config-title">Level</span>
             <div class="grid-options" id="levelOptions"></div>
+            
             <span class="config-title">Letter</span>
             <div class="grid-options" id="azOptions" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); width:100%;"></div>
+            
             <button class="close-config" onclick="toggleConfig()">DONE</button>
         </div>
     </div>
@@ -409,7 +393,14 @@
     ];
 
     let fullVocabData = [], displayData = [];
-    let currentFilter = { type: 'level_az', value: 'All', letter: 'A' }; 
+    
+    // 核心資料結構更新：包含 level, letter, status 三個維度
+    let filterState = {
+        level: 'All',
+        letter: 'A',
+        status: 'all' // all, none, green, yellow, red
+    };
+    
     let sortMode = 'sequential'; 
     let currentIndex = 0;
     let statusDB = {}; 
@@ -427,8 +418,8 @@
     });
 
     function getPageSize() {
-        if (window.innerWidth >= 600) return 2; // Tablet/Desktop
-        return 1; // Mobile
+        if (window.innerWidth >= 600) return 2; 
+        return 1; 
     }
 
     function loadStatusDB() {
@@ -516,8 +507,7 @@
             btn.className = 'opt-btn';
             btn.innerText = l === 'All' ? 'ALL' : l;
             btn.onclick = () => {
-                currentFilter.type = 'level_az';
-                currentFilter.value = l;
+                filterState.level = l; // Update state
                 updateFilterUI();
                 applyFilters(true);
             };
@@ -530,8 +520,7 @@
             btn.className = 'opt-btn';
             btn.innerText = l;
             btn.onclick = () => {
-                currentFilter.type = 'level_az';
-                currentFilter.letter = l;
+                filterState.letter = l; // Update state
                 updateFilterUI();
                 applyFilters(true);
             };
@@ -543,59 +532,92 @@
 
     function setSortMode(mode) {
         sortMode = mode;
-        document.getElementById('btn-seq').classList.toggle('active', mode === 'sequential');
-        document.getElementById('btn-rnd').classList.toggle('active', mode === 'random');
+        updateFilterUI();
         applyFilters(true);
     }
 
-    function filterByStatus(status) {
-        if (currentFilter.type !== 'status' || currentFilter.value !== status) {
-            currentFilter.type = 'status';
-            currentFilter.value = status;
-            updateFilterUI();
-            applyFilters(true);
-        }
+    function setStatusFilter(status) {
+        filterState.status = status;
+        updateFilterUI();
+        applyFilters(true);
     }
 
     function updateFilterUI() {
+        // Reset all buttons
         document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+        
+        // 1. Sort
         document.getElementById('btn-seq').classList.toggle('active', sortMode === 'sequential');
         document.getElementById('btn-rnd').classList.toggle('active', sortMode === 'random');
 
-        let displayText = "";
+        // 2. Level
+        document.querySelectorAll('#levelOptions .opt-btn').forEach(b => {
+            const btnText = b.innerText === 'ALL' ? 'All' : b.innerText;
+            if(btnText === filterState.level) b.classList.add('active');
+        });
+
+        // 3. Letter
+        document.querySelectorAll('#azOptions .opt-btn').forEach(b => {
+            if(b.innerText === filterState.letter) b.classList.add('active');
+        });
+
+        // 4. Status
+        // Remove active from all status buttons
+        ['st-all', 'st-none', 'st-green', 'st-yellow', 'st-red'].forEach(id => {
+            document.getElementById(id).classList.remove('active');
+        });
+        // Add active to current
+        if(filterState.status === 'all') document.getElementById('st-all').classList.add('active');
+        else if(filterState.status === 'none') document.getElementById('st-none').classList.add('active');
+        else if(filterState.status === 'green') document.getElementById('st-green').classList.add('active');
+        else if(filterState.status === 'yellow') document.getElementById('st-yellow').classList.add('active');
+        else if(filterState.status === 'red') document.getElementById('st-red').classList.add('active');
+
+        // 5. Update Display Text Logic
+        let displayStr = "";
         
-        if (currentFilter.type === 'level_az') {
-            document.querySelectorAll('#levelOptions .opt-btn').forEach(b => {
-                if(b.innerText === (currentFilter.value === 'All' ? 'ALL' : currentFilter.value)) b.classList.add('active');
-            });
-            document.querySelectorAll('#azOptions .opt-btn').forEach(b => {
-                if(b.innerText === currentFilter.letter) b.classList.add('active');
-            });
-            
-            const lvl = currentFilter.value === 'All' ? 'All Levels' : currentFilter.value;
-            displayText = `${lvl} • ${currentFilter.letter}`;
-            
-        } else if (currentFilter.type === 'status') {
-            document.querySelector(`.status-filter-btn.${currentFilter.value}`)?.classList.add('active');
-            const mapName = { 'green': 'Mastered', 'yellow': 'To Review', 'red': 'Hard Words' };
-            displayText = mapName[currentFilter.value];
+        // Base logic: Level + Letter
+        const lvlStr = filterState.level === 'All' ? 'All Levels' : filterState.level;
+        displayStr = `${lvlStr} • ${filterState.letter}`;
+
+        // Append status info if not 'all'
+        const statusMap = {
+            'none': 'None',
+            'green': 'Mastered',
+            'yellow': 'Normal',
+            'red': 'Hard'
+        };
+
+        if (filterState.status !== 'all') {
+            displayStr += ` • ${statusMap[filterState.status]}`;
         }
 
-        document.getElementById('filterDisplayText').innerText = displayText;
+        document.getElementById('filterDisplayText').innerText = displayStr;
     }
 
     function applyFilters(resetIndex) {
-        let filtered = [];
-        if (currentFilter.type === 'level_az') {
-            filtered = fullVocabData.filter(item => item.word.toUpperCase().startsWith(currentFilter.letter));
-            if (currentFilter.value !== 'All') {
-                filtered = filtered.filter(item => item.levels.includes(currentFilter.value));
-            }
-        } else if (currentFilter.type === 'status') {
-            filtered = fullVocabData.filter(item => statusDB[item.word] === currentFilter.value);
+        let filtered = fullVocabData;
+
+        // 1. Filter by Level
+        if (filterState.level !== 'All') {
+            filtered = filtered.filter(item => item.levels.includes(filterState.level));
         }
 
+        // 2. Filter by Letter
+        filtered = filtered.filter(item => item.word.toUpperCase().startsWith(filterState.letter));
+
+        // 3. Filter by Status
+        if (filterState.status !== 'all') {
+            if (filterState.status === 'none') {
+                filtered = filtered.filter(item => !statusDB[item.word]);
+            } else {
+                filtered = filtered.filter(item => statusDB[item.word] === filterState.status);
+            }
+        }
+
+        // Sort
         if (sortMode === 'random') {
+            // Fisher-Yates Shuffle
             for (let i = filtered.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
@@ -605,8 +627,10 @@
         }
 
         displayData = filtered;
+        
         if (resetIndex) currentIndex = 0;
         if (currentIndex >= displayData.length) currentIndex = 0;
+        
         renderGrid();
     }
 
@@ -713,7 +737,6 @@
         return wrapper;
     }
 
-    // --- 核心互動：修復翻面問題 ---
     function bindCardInteraction(wrapperElement) {
         const card = wrapperElement.querySelector('.card');
         let startX = 0, startY = 0;
@@ -755,14 +778,12 @@
             card.style.transition = 'transform 0.4s ease'; 
 
             if (getPageSize() === 1 && Math.abs(diffX) > 80 && hasMoved) {
-                // Swipe
                 const dir = diffX > 0 ? -1 : 1; 
                 const flyX = diffX > 0 ? window.innerWidth : -window.innerWidth;
                 const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
                 card.style.transform = `translateX(${flyX}px) rotate(${diffX > 0 ? 20 : -20}deg) ${baseTransform}`;
                 setTimeout(() => nextPage(dir), 200);
             } else {
-                // Reset (Cancel Swipe or Tap)
                 const baseTransform = card.classList.contains('flipped') ? 'rotateY(180deg)' : '';
                 card.style.transform = baseTransform;
 
@@ -773,7 +794,6 @@
             }
         });
 
-        // 桌面版 Click 監聽
         if (!('ontouchstart' in window)) {
             wrapperElement.addEventListener('click', (e) => {
                 if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.status-btn')) return;
