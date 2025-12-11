@@ -655,6 +655,27 @@
         updateFilterUI();
     }
 
+    // --- 新增的功能：重置 App 狀態而不重新整理頁面 ---
+    function resetToHome(event) {
+        if (event) event.preventDefault(); // 阻止連結原本的跳轉行為
+
+        // 1. 重置所有篩選條件
+        filterState = { level: 'All', letter: 'All', status: 'all' };
+        sortMode = 'sequential';
+        
+        // 2. 更新 UI 按鈕狀態
+        updateFilterUI();
+        
+        // 3. 重新套用篩選並回到第一頁 (applyFilters 會處理 currentIndex = 0)
+        applyFilters(true);
+
+        // 4. 如果是手機版側邊選單打開的狀態，要關閉選單
+        const mobileNav = document.getElementById('mobileNav');
+        if (mobileNav && mobileNav.classList.contains('open')) {
+            toggleMobileMenu();
+        }
+    }
+    
     function setSortMode(mode) {
         sortMode = mode;
         updateFilterUI();
