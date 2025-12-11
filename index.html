@@ -282,7 +282,7 @@
             background: rgba(255,255,255,0.5); padding: 6px 16px; border-radius: 12px;
         }
 
-        /* --- Config Panel --- */
+        /* --- Config Panel (Fixed Footer Layout) --- */
         .config-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
@@ -290,26 +290,56 @@
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .config-overlay.open { opacity: 1; pointer-events: auto; }
+        
         .config-panel {
-            background: #fff; border-top-left-radius: 24px; border-top-right-radius: 24px;
-            padding: 30px 24px 50px 24px; transform: translateY(100%);
+            background: #fff; 
+            border-top-left-radius: 24px; 
+            border-top-right-radius: 24px;
+            transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            max-height: 80vh; overflow-y: auto;
+            
+            /* 修改為 Flex column，並設定高度限制以便內部捲動 */
+            display: flex; 
+            flex-direction: column;
+            max-height: 85vh; /* 面板最大高度 */
+            height: 85vh;     /* 固定高度確保 Footer 在底部 */
+            overflow: hidden; /* 防止外層捲動 */
         }
+        
         .config-overlay.open .config-panel { transform: translateY(0); }
+
+        /* 內部可滾動區域 */
+        .config-scroll-area {
+            flex: 1; /* 佔據剩餘空間 */
+            overflow-y: auto; /* 啟用垂直捲動 */
+            padding: 30px 24px 20px 24px;
+            -webkit-overflow-scrolling: touch; /* iOS 平滑捲動 */
+        }
+
+        /* 底部固定區域 */
+        .config-footer {
+            flex-shrink: 0; /* 禁止縮小 */
+            padding: 16px 24px 34px 24px; /* 底部多一點 padding 避開 Home Indicator */
+            background: #fff;
+            border-top: 1px solid #f5f5f5;
+            z-index: 10;
+        }
+
         .config-title {
             font-family: var(--font-eng); font-weight: 700; font-size: 0.9rem;
             color: #AAA; text-transform: uppercase; letter-spacing: 1px;
             margin: 20px 0 10px 0; display: block;
         }
+        
+        /* 第一個 title 不需要上邊距 */
+        .config-title:first-child { margin-top: 0; }
+
         .grid-options { display: flex; flex-wrap: wrap; gap: 8px; }
         
         .opt-btn {
             padding: 8px 16px; border-radius: 8px; border: 1px solid #eee;
             background: #fff; color: var(--text-dark);
             font-family: var(--font-eng); font-weight: 600; font-size: 14px; cursor: pointer;
-            
-            /* 置中修正 */
             display: flex; align-items: center; justify-content: center;
         }
         .opt-btn.active { 
@@ -320,9 +350,7 @@
 
         /* 字母 Grid 專用樣式 */
         #azOptions .opt-btn {
-            padding: 0;      /* 移除 padding，全靠 flex 置中 */
-            height: 40px;    /* 固定高度 */
-            width: 100%;
+            padding: 0; height: 40px; width: 100%;
         }
 
         .status-filter-btn { display: flex; align-items: center; gap: 6px; }
@@ -332,7 +360,8 @@
         .status-filter-btn.red.active { background: var(--status-red) !important; border-color: var(--status-red) !important; color: #fff !important; }
 
         .close-config {
-            width: 100%; padding: 14px; margin-top: 30px;
+            width: 100%; padding: 14px; 
+            /* margin-top 移除了，因為它現在在 footer 裡面 */
             background: #222; color: #fff; border: none; border-radius: 12px;
             font-family: var(--font-eng); font-weight: 700; cursor: pointer;
         }
@@ -376,38 +405,46 @@
         </div>
     </div>
 
+    <!-- Modified Config Overlay Structure -->
     <div class="config-overlay" id="configOverlay">
         <div class="config-panel">
-            <span class="config-title">Order</span>
-            <div class="grid-options">
-                <button class="opt-btn active" id="btn-seq" onclick="setSortMode('sequential')">A-Z</button>
-                <button class="opt-btn" id="btn-rnd" onclick="setSortMode('random')">Shuffle</button>
-            </div>
             
-            <span class="config-title">Status</span>
-            <div class="grid-options" id="statusOptions">
-                <button class="opt-btn" id="st-all" onclick="setStatusFilter('all')">All</button>
-                <button class="opt-btn" id="st-none" onclick="setStatusFilter('none')">None</button>
+            <!-- 可滾動的內容區域 -->
+            <div class="config-scroll-area">
+                <span class="config-title">Order</span>
+                <div class="grid-options">
+                    <button class="opt-btn active" id="btn-seq" onclick="setSortMode('sequential')">A-Z</button>
+                    <button class="opt-btn" id="btn-rnd" onclick="setSortMode('random')">Shuffle</button>
+                </div>
                 
-                <button class="opt-btn status-filter-btn green" id="st-green" onclick="setStatusFilter('green')">
-                    <span class="material-icons" style="font-size:16px;">sentiment_very_satisfied</span> Mastered
-                </button>
-                <button class="opt-btn status-filter-btn yellow" id="st-yellow" onclick="setStatusFilter('yellow')">
-                    <span class="material-icons" style="font-size:16px;">sentiment_neutral</span> Normal
-                </button>
-                <button class="opt-btn status-filter-btn red" id="st-red" onclick="setStatusFilter('red')">
-                    <span class="material-icons" style="font-size:16px;">sentiment_very_dissatisfied</span> Hard
-                </button>
+                <span class="config-title">Status</span>
+                <div class="grid-options" id="statusOptions">
+                    <button class="opt-btn" id="st-all" onclick="setStatusFilter('all')">All</button>
+                    <button class="opt-btn" id="st-none" onclick="setStatusFilter('none')">None</button>
+                    
+                    <button class="opt-btn status-filter-btn green" id="st-green" onclick="setStatusFilter('green')">
+                        <span class="material-icons" style="font-size:16px;">sentiment_very_satisfied</span> Mastered
+                    </button>
+                    <button class="opt-btn status-filter-btn yellow" id="st-yellow" onclick="setStatusFilter('yellow')">
+                        <span class="material-icons" style="font-size:16px;">sentiment_neutral</span> Normal
+                    </button>
+                    <button class="opt-btn status-filter-btn red" id="st-red" onclick="setStatusFilter('red')">
+                        <span class="material-icons" style="font-size:16px;">sentiment_very_dissatisfied</span> Hard
+                    </button>
+                </div>
+                
+                <span class="config-title">Level</span>
+                <div class="grid-options" id="levelOptions"></div>
+                
+                <span class="config-title">Letter</span>
+                <div class="grid-options" id="azOptions"></div>
             </div>
-            
-            <span class="config-title">Level</span>
-            <div class="grid-options" id="levelOptions"></div>
-            
-            <span class="config-title">Letter</span>
-            <!-- JS 設定 Grid 樣式 -->
-            <div class="grid-options" id="azOptions"></div>
-            
-            <button class="close-config" onclick="toggleConfig()">DONE</button>
+
+            <!-- 固定在底部的 Footer -->
+            <div class="config-footer">
+                <button class="close-config" onclick="toggleConfig()">DONE</button>
+            </div>
+
         </div>
     </div>
 
@@ -501,7 +538,6 @@
             if (raw) {
                 const state = JSON.parse(raw);
                 if (state.filter) filterState = state.filter;
-                // 修正：如果舊的 State 沒有 'All' 選項，需要校正
                 if (!filterState.letter) filterState.letter = 'All';
 
                 if (state.sort) sortMode = state.sort;
@@ -590,13 +626,10 @@
             lvlContainer.appendChild(btn);
         });
 
-        // 設置字母按鈕 (加入 ALL)
         const azContainer = document.getElementById('azOptions');
         azContainer.innerHTML = '';
-        // 修正 Grid 樣式與 Gap
         azContainer.style.cssText = "display:grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); width:100%; gap: 8px;"; 
 
-        // 1. 新增 ALL 按鈕
         const allAzBtn = document.createElement('button');
         allAzBtn.className = 'opt-btn';
         allAzBtn.innerText = 'ALL';
@@ -607,7 +640,6 @@
         };
         azContainer.appendChild(allAzBtn);
 
-        // 2. 循環 A-Z
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
@@ -647,7 +679,6 @@
         });
 
         document.querySelectorAll('#azOptions .opt-btn').forEach(b => {
-            // 處理 ALL 和 單一字母的選中狀態
             const letterText = b.innerText === 'ALL' ? 'All' : b.innerText;
             if(letterText === filterState.letter) b.classList.add('active');
         });
@@ -663,7 +694,6 @@
 
         let displayStr = "";
         const lvlStr = filterState.level === 'All' ? 'All Levels' : filterState.level;
-        // 顯示 Letter
         const letterStr = filterState.letter === 'All' ? 'A-Z' : filterState.letter;
         displayStr = `${lvlStr} • ${letterStr}`;
 
@@ -688,7 +718,6 @@
             filtered = filtered.filter(item => item.levels.includes(filterState.level));
         }
 
-        // 修改：如果不是 All 才篩選開頭字母
         if (filterState.letter !== 'All') {
             filtered = filtered.filter(item => item.word.toUpperCase().startsWith(filterState.letter));
         }
@@ -831,22 +860,17 @@
         return wrapper;
     }
 
-    // --- 修改後的狀態設定邏輯 ---
     function setWordStatus(word, status) {
-        // 1. 更新資料庫
         if (statusDB[word] === status) {
-            // 如果點擊相同的，保持該狀態 (如需取消請取消下方註解)
             // delete statusDB[word]; 
         } else {
             statusDB[word] = status;
         }
         saveStatusDB();
 
-        // 2. 獲取當前操作的卡片 DOM
         const activeWrapper = document.querySelector(`.card-wrapper[data-word="${word}"]`);
         if (!activeWrapper) return;
 
-        // 3. 立即更新按鈕樣式 (視覺即時回饋)
         const btns = activeWrapper.querySelectorAll('.status-btn');
         btns.forEach(b => b.classList.remove('active'));
         if (statusDB[word]) {
@@ -854,13 +878,11 @@
             if(targetBtn) targetBtn.classList.add('active');
         }
 
-        // 4. 觸發全版 Feedback Overlay 動畫
         const overlay = activeWrapper.querySelector('.feedback-overlay');
         const content = overlay.querySelector('.feedback-content');
         const icon = overlay.querySelector('.feedback-icon');
         const text = overlay.querySelector('.feedback-text');
 
-        // 重置並設定顏色 class
         content.className = 'feedback-content ' + status;
         
         if (status === 'green') {
@@ -874,19 +896,14 @@
             text.innerText = 'Hard';
         }
 
-        // 顯示遮罩
         overlay.classList.add('show');
 
-        // 5. 判斷是否需要移除卡片 (Reload Grid)
-        // 規則：如果當前篩選器是 'All'，則保留卡片。
-        // 如果當前篩選器是 Specific (例如 Mastered)，且新狀態 (例如 Normal) 不符合，則移除。
-        
         const isFilterAll = (filterState.status === 'all');
         const isFilterNone = (filterState.status === 'none');
         
         let matchesFilter = false;
         if (isFilterAll) {
-            matchesFilter = true; // All 模式下永遠保留
+            matchesFilter = true;
         } else if (isFilterNone) {
             matchesFilter = !statusDB[word];
         } else {
@@ -894,13 +911,11 @@
         }
 
         if (!matchesFilter) {
-            // 不符合過濾條件 -> 延遲後移除並切換下一張
             setTimeout(() => {
                 overlay.classList.remove('show');
-                applyFilters(false); // false = 不重置 index，下一張會自動補上
+                applyFilters(false);
             }, 600); 
         } else {
-            // 符合過濾條件 (或 All 模式) -> 延遲後僅關閉遮罩，卡片保留
             setTimeout(() => {
                 overlay.classList.remove('show');
             }, 600);
