@@ -1,6 +1,6 @@
 <head>
-    <!-- ★ 修改：引入 Material Icons Round (圓角風格圖示) ★ -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round" rel="stylesheet">
+    <!-- ★ 修改 1：引入 Outlined (線條風格) 的字體 ★ -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -17,7 +17,10 @@
         box-shadow: none;
         display: flex; align-items: center; justify-content: space-between;
         box-sizing: border-box;
-        z-index: 9999; 
+        
+        /* ★ 修改 2：這裡改為 10010，必須比 mobile-nav-drawer (10004) 高，按鈕才按得到 ★ */
+        z-index: 10010; 
+        
         pointer-events: auto !important;
         padding-top: env(safe-area-inset-top);
         height: calc(80px + env(safe-area-inset-top));
@@ -31,7 +34,8 @@
     /* Logo */
     .header-logo {
         display: flex; align-items: center; text-decoration: none; height: 100%; cursor: pointer;
-        z-index: 10002;
+        /* Logo 不需要太高，但也沒關係 */
+        z-index: 10011;
     }
     .header-logo img {
         height: 40px; width: auto; object-fit: contain; display: block;
@@ -74,19 +78,18 @@
         background-color: transparent; border: none;
         color: #0056D2; 
         outline: none; 
-        
-        /* 按鈕外框圓角 (保留) */
         border-radius: 12px;
-        
         transition: transform 0.2s, color 0.2s, background-color 0.2s;
-        z-index: 10005;
+        /* 這裡的 z-index 其實是相對於 Header 的，所以 Header 高了這裡就沒問題 */
+        z-index: 10012; 
         pointer-events: auto !important; 
     }
     .mobile-menu-btn:active { transform: scale(0.9); background-color: rgba(0, 86, 210, 0.05); }
     
-    /* ★ 修改：針對圓角 Icon 設定大小 ★ */
+    /* ★ 修改 3：使用 material-icons-outlined 樣式，並設定適當大小 ★ */
     .mobile-menu-btn .material-icons, 
-    .mobile-menu-btn .material-icons-round { 
+    .mobile-menu-btn .material-icons-round,
+    .mobile-menu-btn .material-icons-outlined { 
         font-size: 32px; 
     }
     
@@ -97,7 +100,7 @@
     .menu-backdrop {
         position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
         background: rgba(0, 0, 0, 0.4);
-        z-index: 10003;
+        z-index: 10003; /* 比 Header 低，所以 Header 在上面 */
         opacity: 0; pointer-events: none;
         transition: opacity 0.3s ease;
         backdrop-filter: blur(2px);
@@ -107,7 +110,8 @@
     /* Mobile Drawer */
     .mobile-nav-drawer {
         position: fixed; top: 0; right: 0; width: 75%; max-width: 320px; height: 100vh;
-        background: #0056D2; z-index: 10004;
+        background: #0056D2; 
+        z-index: 10004; /* 比 Header (10010) 低，這樣按鈕才不會被蓋住 */
         transform: translateX(100%);
         visibility: hidden; box-shadow: none;
         transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.35s;
@@ -158,8 +162,9 @@
     </nav>
     
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-        <!-- ★ 修改：使用 material-icons-round 來顯示圓角圖示 ★ -->
-        <span class="material-icons-round">grid_view</span>
+        <!-- ★ 修改 4：改用 'material-icons-outlined' 並且文字改為 'menu' (三條線) ★ -->
+        <!-- 如果你堅持要完全兩條線，可以把 'menu' 改成 'drag_handle'，但通常 menu 比較直觀 -->
+        <span class="material-icons-outlined">menu</span>
     </button>
 </header>
 
@@ -178,18 +183,18 @@
         const menu = document.getElementById('mobileNav');
         const backdrop = document.getElementById('menuBackdrop');
         const btn = document.querySelector('.mobile-menu-btn');
-        
-        // ★ 修改：抓取 span 元素，不論 class 是 material-icons 還是 material-icons-round ★
         const btnIcon = btn.querySelector('span');
         
         if (menu.classList.contains('open')) {
             menu.classList.remove('open');
             backdrop.classList.remove('open');
-            btnIcon.innerText = 'grid_view';
+            // 恢復成漢堡選單 (menu)
+            btnIcon.innerText = 'menu';
             btn.classList.remove('white');
         } else {
             menu.classList.add('open');
             backdrop.classList.add('open');
+            // 變成關閉圖示 (close)
             btnIcon.innerText = 'close';
             btn.classList.add('white');
         }
