@@ -119,10 +119,8 @@
             min-height: 0; 
             display: grid;
             grid-template-columns: 1fr;
-            /* 原本是: grid-template-rows: 1fr; */
-            /* 改成下面這樣，強制限制高度不被內容撐開 */
+            /* 修正版面問題：改為 minmax(0, 1fr) 防止內容撐開高度 */
             grid-template-rows: minmax(0, 1fr); 
-            /* ---------------- */ 
             gap: 16px;
             perspective: 1000px;
             justify-items: center;
@@ -154,9 +152,8 @@
             border-radius: var(--card-radius);
             overflow: hidden;
             display: flex; flex-direction: column;
-            /* --- 加入這行 --- */
+            /* 修正版面問題：Flex 子元素最小高度設為 0 */
             min-height: 0;
-            /* ---------------- */
         }
         
         .front-face { z-index: 2; }
@@ -471,8 +468,10 @@
 
     let fullVocabData = [], displayData = [];
     
-    // 預設 Letter 為 'All'
-    let filterState = { level: 'All', letter: 'All', status: 'all' };
+    // --- 修改：預設 Letter 為 'A' (針對新使用者) ---
+    // 如果是老使用者，loadAppState 會覆蓋這個設定
+    let filterState = { level: 'All', letter: 'A', status: 'all' };
+    
     let sortMode = 'sequential'; 
     let currentIndex = 0;
     let statusDB = {}; 
@@ -483,7 +482,7 @@
 
     // --- Init Sequence ---
     loadStatusDB(); 
-    loadAppState(); 
+    loadAppState(); // 這裡會讀取儲存的狀態，如果有紀錄就會覆蓋 'A'
     initUI();       
     fetchAllLevels(); 
     
@@ -545,6 +544,7 @@
             if (raw) {
                 const state = JSON.parse(raw);
                 if (state.filter) filterState = state.filter;
+                // 如果是極舊的存檔沒有 letter，才給預設值，否則保持儲存的值 (或初始的 A)
                 if (!filterState.letter) filterState.letter = 'All';
 
                 if (state.sort) sortMode = state.sort;
@@ -662,21 +662,17 @@
         updateFilterUI();
     }
 
-    // --- 新增的功能：重置 App 狀態而不重新整理頁面 ---
+    // --- 修改：重置功能回到 'A' ---
     function resetToHome(event) {
-        if (event) event.preventDefault(); // 阻止連結原本的跳轉行為
+        if (event) event.preventDefault(); 
 
-        // 1. 重置所有篩選條件
-        filterState = { level: 'All', letter: 'All', status: 'all' };
+        // 這裡也改成 'A'，確保體驗一致
+        filterState = { level: 'All', letter: 'A', status: 'all' };
         sortMode = 'sequential';
         
-        // 2. 更新 UI 按鈕狀態
         updateFilterUI();
-        
-        // 3. 重新套用篩選並回到第一頁 (applyFilters 會處理 currentIndex = 0)
-        applyFilters(true);
+        applyFilters(true); // resetIndex = true
 
-        // 4. 如果是手機版側邊選單打開的狀態，要關閉選單
         const mobileNav = document.getElementById('mobileNav');
         if (mobileNav && mobileNav.classList.contains('open')) {
             toggleMobileMenu();
